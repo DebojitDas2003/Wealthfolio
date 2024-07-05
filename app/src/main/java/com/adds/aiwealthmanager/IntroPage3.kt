@@ -28,7 +28,7 @@ import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
 @Composable
 fun IntroPage3() {
-    MaterialTheme {
+
         Surface(modifier = Modifier.fillMaxSize(),
             color = DeepGreen) {
 
@@ -51,7 +51,7 @@ fun IntroPage3() {
                     contentDescription = "",
                     modifier = Modifier
                         .size(250.dp)
-                        .padding(0.dp, 20.dp, 0.dp, 80.dp))
+                        .padding(0.dp, 100.dp, 0.dp, 0.dp))
 
 
                 val intro2 = buildAnnotatedString {
@@ -87,7 +87,7 @@ fun IntroPage3() {
                 Text(intro2)
             }
         }
-    }
+
 }
 
 @Preview

@@ -33,7 +33,7 @@ import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
 @Composable
 fun IntroPage1() {
-    MaterialTheme {
+
         Surface(
             modifier = Modifier
                 .fillMaxSize(),
@@ -85,15 +85,15 @@ fun IntroPage1() {
                         .padding(30.dp, 10.dp, 30.dp, 100.dp),
                     textAlign = TextAlign.Center)
 
-                Button(onClick = { /*TODO*/ }) {
-                    Text(text = "Welcome",
-                        fontFamily = poppinsFontFamily,
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 24.sp,)
-                }
+//                Button(onClick = { /*TODO*/ }) {
+//                    Text(text = "Welcome",
+//                        fontFamily = poppinsFontFamily,
+//                        fontWeight = FontWeight.Bold,
+//                        fontSize = 24.sp,)
+//                }
             }
         }
-    }
+
 }
 
 

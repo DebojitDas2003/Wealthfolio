@@ -28,7 +28,7 @@ import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
 @Composable
 fun IntroPage2() {
-    MaterialTheme {
+
         Surface(modifier = Modifier.fillMaxSize(),
             color = DeepGreen) {
 
@@ -87,7 +87,6 @@ fun IntroPage2() {
                 Text(intro2)
             }
         }
-    }
 }
 
 @Preview
