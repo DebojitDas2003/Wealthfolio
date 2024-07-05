@@ -76,7 +76,7 @@ fun IntroPage1() {
 
                 Text(text = wealthFolio)
 
-                Text(text = "your personal ai manager app",
+                Text(text = "your personal ai manager app 🤖",
                     color = Color.White,
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.Bold,
