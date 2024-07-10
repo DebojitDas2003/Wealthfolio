@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,33 +35,36 @@ import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
 @Composable
 fun CostList() {
-    MaterialTheme{
-        Surface(modifier = Modifier.fillMaxSize(),
-            color = DeepGreen) {
-
-
+    MaterialTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = DeepGreen
+        ) {
             Star3()
 
             Column(modifier = Modifier.padding(10.dp)) {
                 Spacer(modifier = Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.SpaceBetween,
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()) {
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     BackButton {}
 
-                    Text(text = "Your Daily Expenses",
+                    Text(
+                        text = "Your Daily Expenses",
                         color = Color.White,
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp)
+                        fontSize = 20.sp,
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center
+                    )
 
                     MenuButton {}
-
                 }
 
                 Spacer(modifier = Modifier.height(30.dp))
-
-
 
                 Surface(
                     modifier = Modifier
@@ -84,10 +86,6 @@ fun CostList() {
                             .padding(16.dp)
                     )
                 }
-
-
-
-
             }
         }
     }
@@ -105,20 +103,17 @@ fun BackButton(onClick: () -> Unit) {
     }
 }
 
-
 @Composable
 fun MenuButton(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Default.Menu,
-            contentDescription = "Previous",
+            contentDescription = "Menu",
             tint = Color.White,
             modifier = Modifier.size(50.dp)
         )
     }
 }
-
-
 
 @Preview
 @Composable

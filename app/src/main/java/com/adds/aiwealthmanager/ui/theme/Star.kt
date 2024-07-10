@@ -40,8 +40,19 @@ fun Star3() {
     }
 }
 
+
+@Composable
+fun Star4() {
+    Column(modifier = Modifier
+        .fillMaxSize()) {Image(painter = painterResource(id = R.drawable.star), contentDescription = "star", alignment = Alignment.TopStart, modifier = Modifier.padding(70.dp, 90.dp, 0.dp, 0.dp))
+        Image(painter = painterResource(id = R.drawable.star), contentDescription = "star", alignment = Alignment.BottomEnd, modifier = Modifier.padding(300.dp, 110.dp, 0.dp, 0.dp))
+    }
+}
+
+
+
 @Preview
 @Composable
 fun StarDemo() {
-    Star3()
+    Star4()
 }

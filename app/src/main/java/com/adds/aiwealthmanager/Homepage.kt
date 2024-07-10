@@ -27,14 +27,39 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
+import com.adds.aiwealthmanager.ui.theme.LimeGreen
+import com.adds.aiwealthmanager.ui.theme.NavyBlue
+import com.adds.aiwealthmanager.ui.theme.Star4
 import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
+import java.time.LocalDateTime
 
 @Composable
 fun Homepage() {
+
+
+    val currentTime = LocalDateTime.now()
+    val hour = currentTime.hour
+
+    val greeting = when(hour) {
+        in 0..11 -> "Good Morning"
+        12 -> "Good Noon"
+        in 13..17 -> "Good Afternoon"
+        else -> "Good Night"
+    }
+
+
+
+
     MaterialTheme{
         Surface(modifier = Modifier.fillMaxSize(),
             color = DeepGreen) {
-            Column(modifier = Modifier.padding(10.dp)) {
+
+
+            Star4()
+
+
+            Column(modifier = Modifier.padding(10.dp),
+                horizontalAlignment = Alignment.CenterHorizontally) {
 
                 Spacer(modifier = Modifier.height(10.dp))
 
@@ -60,6 +85,31 @@ fun Homepage() {
 
 
                 }
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                Text(text = greeting,
+                    color = Color.White,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 26.sp)
+
+                Text(text = "USER",
+                    color = LimeGreen,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 36.sp)
+
+
+                Spacer(modifier = Modifier.height(50.dp))
+
+                Text(text = "Here is your today's expenditure",
+                    color = NavyBlue,
+                    fontFamily = poppinsFontFamily,
+                    fontWeight = FontWeight.SemiBold,
+                    fontSize = 20.sp)
+
+
 
 
 
@@ -95,6 +145,7 @@ fun UserButton(onClick: () -> Unit) {
         )
     }
 }
+
 
 @Preview
 @Composable
