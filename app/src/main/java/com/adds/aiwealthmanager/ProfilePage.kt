@@ -14,6 +14,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -61,7 +63,8 @@ fun ProfilePage() {
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Column(modifier = Modifier.padding(50.dp)) {
+                Column(modifier = Modifier.fillMaxWidth()
+                    .padding(20.dp)) {
                     Spacer(modifier = Modifier.height(150.dp))
 
 
@@ -90,28 +93,11 @@ fun ProfilePage() {
 
                     Spacer(modifier = Modifier.height(50.dp))
 
-                    Row(horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier.fillMaxWidth()) {
-                        Text(text = "Gender",
-                            color = Color.White,
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp)
-
-                        Text(text = "Age",
-                            color = Color.White,
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp)
-
-                        Text(text = "Weight",
-                            color = Color.White,
-                            fontFamily = poppinsFontFamily,
-                            fontWeight = FontWeight.Normal,
-                            fontSize = 14.sp)
-
-
-                    }
+                    Text(text = "Budget",
+                        color = Color.White,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Normal,
+                        fontSize = 14.sp)
 
                 }
 

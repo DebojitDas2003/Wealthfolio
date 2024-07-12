@@ -33,7 +33,9 @@ import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 fun RegistrationPage() {
     val name = remember { mutableStateOf("") }
     val email = remember { mutableStateOf("") }
-    val password = remember { mutableStateOf("") }
+    val enterPassword = remember { mutableStateOf("") }
+    val confirmPassword = remember { mutableStateOf("") }
+    val dailyBudget = remember { mutableStateOf("") }
 
     MaterialTheme {
         Surface(
@@ -52,8 +54,8 @@ fun RegistrationPage() {
                     text = "SignUp",
                     color = LightBlue,
                     fontFamily = poppinsFontFamily,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 22.sp
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 32.sp
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -80,15 +82,39 @@ fun RegistrationPage() {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 OutlinedTextField(
-                    value = password.value,
-                    onValueChange = { password.value = it },
-                    label = { Text("Password",
+                    value = dailyBudget.value,
+                    onValueChange = { dailyBudget.value = it },
+                    label = { Text("Daily Budget",
                         color = Color.White) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
+
+                OutlinedTextField(
+                    value = enterPassword.value,
+                    onValueChange = { enterPassword.value = it },
+                    label = { Text("Create Password",
+                        color = Color.White) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                OutlinedTextField(
+                    value = confirmPassword.value,
+                    onValueChange = { confirmPassword.value = it },
+                    label = { Text("Confirm Password",
+                        color = Color.White) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+
 
                 Button(onClick = { /* Handle sign-up logic here */ }) {
                     Text("Sign Up")
