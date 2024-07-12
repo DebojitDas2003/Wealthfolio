@@ -2,6 +2,7 @@ package com.adds.aiwealthmanager
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +26,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.adds.aiwealthmanager.ui.theme.DarkBlue
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
 import com.adds.aiwealthmanager.ui.theme.LightBlue
 import com.adds.aiwealthmanager.ui.theme.Star2
@@ -114,10 +117,33 @@ fun RegistrationPage() {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
+                Row(horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = "Have an account?",
+                        color = Color.White,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp)
+
+                    TextButton(onClick = { /*TODO*/ }) {
+                        Text(text = "Login",
+                            color = DarkBlue,
+                            fontFamily = poppinsFontFamily,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp)
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
 
 
                 Button(onClick = { /* Handle sign-up logic here */ }) {
-                    Text("Sign Up")
+                    Text("Sign Up",
+                        color = Color.White,
+                        fontFamily = poppinsFontFamily,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 15.sp)
                 }
             }
         }
