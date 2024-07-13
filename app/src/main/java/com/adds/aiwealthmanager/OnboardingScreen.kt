@@ -1,5 +1,6 @@
 package com.adds.aiwealthmanager
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.runtime.*
 import androidx.compose.foundation.layout.*
@@ -14,20 +15,20 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
 
 @Composable
-fun OnboardingScreen() {
-    // State to keep track of the current screen
+fun OnboardingScreen(navController: NavController, sharedPreferences: SharedPreferences) {
     var currentScreen by remember { mutableStateOf(0) }
-
-    // List of screens
     val screens = listOf<@Composable () -> Unit>(
         { IntroPage1() },
         { IntroPage2() },
@@ -37,15 +38,12 @@ fun OnboardingScreen() {
     )
 
     MaterialTheme {
-        Surface(modifier = Modifier.fillMaxSize(),
-            color = DeepGreen) {
+        Surface(modifier = Modifier.fillMaxSize(), color = DeepGreen) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize(),
+                modifier = Modifier.fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // Display the current screen
                 Box(
                     modifier = Modifier
                         .weight(1f)
@@ -55,15 +53,40 @@ fun OnboardingScreen() {
                     screens[currentScreen]()
                 }
 
-                // Navigation buttons
-                Indicator(
-                    pageSize = screens.size,
-                    currentPage = currentScreen,
-                    onNext = { if (currentScreen < screens.size - 1) currentScreen++ },
-                    onPrev = { if (currentScreen > 0) currentScreen-- }
-                )
+                if (currentScreen == 0) {
+                    WelcomeButton(onClick = { currentScreen++ })
+                } else {
+                    Indicator(
+                        pageSize = screens.size,
+                        currentPage = currentScreen,
+                        onNext = {
+                            if (currentScreen < screens.size - 1) {
+                                currentScreen++
+                            }
+                        },
+                        onPrev = {
+                            if (currentScreen > 0) {
+                                currentScreen--
+                            }
+                        },
+                        showNextButton = currentScreen != screens.size - 1,
+                        onEnter = {
+                            sharedPreferences.edit().putBoolean("OnboardingCompleted", true).apply()
+                            navController.navigate("homepage") {
+                                popUpTo("onboarding") { inclusive = true }
+                            }
+                        }
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+fun WelcomeButton(onClick: () -> Unit) {
+    Button(onClick = onClick) {
+        Text(text = "Welcome")
     }
 }
 
@@ -73,6 +96,8 @@ fun Indicator(
     currentPage: Int,
     onNext: () -> Unit,
     onPrev: () -> Unit,
+    showNextButton: Boolean,
+    onEnter: () -> Unit,
     selectedColor: Color = Color.Green,
     unselectedColor: Color = Color.White
 ) {
@@ -98,7 +123,11 @@ fun Indicator(
                 )
             }
         }
-        NextButton(onClick = onNext)
+        if (showNextButton) {
+            NextButton(onClick = onNext)
+        } else {
+            EnterButton(onClick = onEnter)
+        }
     }
 }
 
@@ -124,9 +153,16 @@ fun PrevButton(onClick: () -> Unit) {
     }
 }
 
+@Composable
+fun EnterButton(onClick: () -> Unit) {
+    Button(onClick = onClick) {
+        Text(text = "Enter", color = Color.White)
+    }
+}
 
 @Preview
 @Composable
 fun OnboardingScreenDemo() {
-    OnboardingScreen()
+    // For preview, we can't use NavController, so this is just a placeholder
+    OnboardingScreen(navController = rememberNavController(), sharedPreferences = null!!)
 }

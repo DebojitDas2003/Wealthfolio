@@ -1,15 +1,14 @@
 package com.adds.aiwealthmanager
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.adds.aiwealthmanager.ui.theme.AIWealthManagerTheme
 
@@ -19,25 +18,21 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         setContent {
             AIWealthManagerTheme {
-                // A surface container using the 'background' color from the theme
-                OnboardingScreen()
+                val navController = rememberNavController()
+
+                // Check if onboarding is completed
+                val sharedPreferences = getSharedPreferences("AIWealthManagerPrefs", Context.MODE_PRIVATE)
+                val isOnboardingCompleted = sharedPreferences.getBoolean("OnboardingCompleted", false)
+
+                NavHost(
+                    navController = navController,
+                    startDestination = if (isOnboardingCompleted) "homepage" else "onboarding"
+                ) {
+                    composable("onboarding") { OnboardingScreen(navController, sharedPreferences) }
+                    composable("homepage") { Homepage(navController) }
+                    composable("profile") { ProfilePage(navController) }
+                }
             }
         }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    AIWealthManagerTheme {
-        Greeting("Android")
     }
 }

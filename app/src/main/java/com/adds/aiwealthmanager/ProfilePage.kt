@@ -1,6 +1,5 @@
 package com.adds.aiwealthmanager
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,8 +13,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -24,15 +21,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
 import com.adds.aiwealthmanager.ui.theme.LightBlue
-import com.adds.aiwealthmanager.ui.theme.Purple
 import com.adds.aiwealthmanager.ui.theme.Star2
 import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
 @Composable
-fun ProfilePage() {
-    MaterialTheme{
+fun ProfilePage(navController: NavController) {
+    MaterialTheme {
         Surface(color = DeepGreen,
             modifier = Modifier.fillMaxSize()) {
 
@@ -46,7 +44,7 @@ fun ProfilePage() {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    BackButton {}
+                    BackButton { navController.popBackStack() }
 
                     Text(
                         text = "Profile",
@@ -58,7 +56,7 @@ fun ProfilePage() {
                         textAlign = TextAlign.Center
                     )
 
-                    MenuButton {}
+                    MenuButton { }
                 }
 
                 Spacer(modifier = Modifier.height(30.dp))
@@ -66,7 +64,6 @@ fun ProfilePage() {
                 Column(modifier = Modifier.fillMaxWidth()
                     .padding(20.dp)) {
                     Spacer(modifier = Modifier.height(150.dp))
-
 
                     Text(text = "Username",
                         color = Color.White,
@@ -90,7 +87,6 @@ fun ProfilePage() {
                         fontWeight = FontWeight.Normal,
                         fontSize = 14.sp)
 
-
                     Spacer(modifier = Modifier.height(50.dp))
 
                     Text(text = "Budget",
@@ -98,7 +94,6 @@ fun ProfilePage() {
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Normal,
                         fontSize = 14.sp)
-
                 }
 
                 Spacer(modifier = Modifier.height(80.dp))
@@ -109,16 +104,15 @@ fun ProfilePage() {
                         fontWeight = FontWeight.Bold,
                         fontSize = 24.sp,)
                 }
-
             }
         }
     }
 }
 
-
-
 @Preview
 @Composable
 fun ProfilePageDemo() {
-    ProfilePage()
+    ProfilePage(navController = rememberNavController())
 }
+
+

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,9 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
 import com.adds.aiwealthmanager.ui.theme.LimeGreen
 import com.adds.aiwealthmanager.ui.theme.NavyBlue
@@ -34,9 +33,7 @@ import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 import java.time.LocalDateTime
 
 @Composable
-fun Homepage() {
-
-
+fun Homepage(navController: NavController) {
     val currentTime = LocalDateTime.now()
     val hour = currentTime.hour
 
@@ -47,17 +44,10 @@ fun Homepage() {
         else -> "Good Night"
     }
 
-
-
-
     MaterialTheme{
         Surface(modifier = Modifier.fillMaxSize(),
             color = DeepGreen) {
-
-
             Star4()
-
-
             Column(modifier = Modifier.padding(10.dp),
                 horizontalAlignment = Alignment.CenterHorizontally) {
 
@@ -67,9 +57,7 @@ fun Homepage() {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()) {
 
-                    NotificationButton {
-
-                    }
+                    NotificationButton { }
 
                     Text(text = "Dashboard",
                         color = Color.White,
@@ -78,12 +66,8 @@ fun Homepage() {
                         fontSize = 22.sp)
 
                     UserButton {
-
+                        navController.navigate("profile")
                     }
-
-
-
-
                 }
 
                 Spacer(modifier = Modifier.height(50.dp))
@@ -100,7 +84,6 @@ fun Homepage() {
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 36.sp)
 
-
                 Spacer(modifier = Modifier.height(50.dp))
 
                 Text(text = "Here is your today's expenditure",
@@ -108,19 +91,10 @@ fun Homepage() {
                     fontFamily = poppinsFontFamily,
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp)
-
-
-
-
-
-
-
-
             }
         }
     }
 }
-
 
 @Composable
 fun NotificationButton(onClick: () -> Unit) {
@@ -144,11 +118,4 @@ fun UserButton(onClick: () -> Unit) {
             modifier = Modifier.size(50.dp)
         )
     }
-}
-
-
-@Preview
-@Composable
-fun HomepageDemo() {
-    Homepage()
 }
