@@ -31,6 +31,7 @@ class MainActivity : ComponentActivity() {
                     composable("onboarding") { OnboardingScreen(navController, sharedPreferences) }
                     composable("homepage") { Homepage(navController) }
                     composable("profile") { ProfilePage(navController) }
+                    composable("notification") { NotificationPage(navController)}
                 }
             }
         }

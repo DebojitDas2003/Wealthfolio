@@ -85,12 +85,6 @@ fun IntroPage1() {
                         .padding(30.dp, 10.dp, 30.dp, 100.dp),
                     textAlign = TextAlign.Center)
 
-//                Button(onClick = { /*TODO*/ }) {
-//                    Text(text = "Welcome",
-//                        fontFamily = poppinsFontFamily,
-//                        fontWeight = FontWeight.Bold,
-//                        fontSize = 24.sp,)
-//                }
             }
         }
 

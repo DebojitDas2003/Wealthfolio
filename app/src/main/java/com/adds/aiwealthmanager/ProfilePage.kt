@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -25,6 +27,9 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
 import com.adds.aiwealthmanager.ui.theme.LightBlue
+import com.adds.aiwealthmanager.ui.theme.Purple
+import com.adds.aiwealthmanager.ui.theme.Purple40
+import com.adds.aiwealthmanager.ui.theme.Purple80
 import com.adds.aiwealthmanager.ui.theme.Star2
 import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
@@ -61,7 +66,8 @@ fun ProfilePage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(30.dp))
 
-                Column(modifier = Modifier.fillMaxWidth()
+                Column(modifier = Modifier
+                    .fillMaxWidth()
                     .padding(20.dp)) {
                     Spacer(modifier = Modifier.height(150.dp))
 
@@ -98,10 +104,12 @@ fun ProfilePage(navController: NavController) {
 
                 Spacer(modifier = Modifier.height(80.dp))
 
-                Button(onClick = { /*TODO*/ }) {
+                Button(onClick = { /*TODO*/ },
+                    colors = ButtonDefaults.buttonColors(containerColor = Purple40)) {
                     Text(text = "Edit Profile",
                         fontFamily = poppinsFontFamily,
                         fontWeight = FontWeight.Bold,
+                        color = Color.White,
                         fontSize = 24.sp,)
                 }
             }

@@ -57,7 +57,7 @@ fun Homepage(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.fillMaxWidth()) {
 
-                    NotificationButton { }
+                    NotificationButton { navController.navigate("notification") }
 
                     Text(text = "Dashboard",
                         color = Color.White,
@@ -101,7 +101,7 @@ fun NotificationButton(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Default.Notifications,
-            contentDescription = "Previous",
+            contentDescription = "Notification",
             tint = Color.White,
             modifier = Modifier.size(50.dp)
         )
@@ -113,7 +113,7 @@ fun UserButton(onClick: () -> Unit) {
     IconButton(onClick = onClick) {
         Icon(
             imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Previous",
+            contentDescription = "Profile",
             tint = Color.White,
             modifier = Modifier.size(50.dp)
         )

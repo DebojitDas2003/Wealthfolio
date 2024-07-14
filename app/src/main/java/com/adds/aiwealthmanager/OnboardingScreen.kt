@@ -10,6 +10,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBackIos
 import androidx.compose.material.icons.filled.ArrowForwardIos
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -25,6 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
+import com.adds.aiwealthmanager.ui.theme.Purple40
 
 @Composable
 fun OnboardingScreen(navController: NavController, sharedPreferences: SharedPreferences) {
@@ -85,7 +87,8 @@ fun OnboardingScreen(navController: NavController, sharedPreferences: SharedPref
 
 @Composable
 fun WelcomeButton(onClick: () -> Unit) {
-    Button(onClick = onClick) {
+    Button(onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = Purple40)) {
         Text(text = "Welcome")
     }
 }
@@ -155,7 +158,8 @@ fun PrevButton(onClick: () -> Unit) {
 
 @Composable
 fun EnterButton(onClick: () -> Unit) {
-    Button(onClick = onClick) {
+    Button(onClick = onClick,
+        colors = ButtonDefaults.buttonColors(containerColor = Purple40)) {
         Text(text = "Enter", color = Color.White)
     }
 }
