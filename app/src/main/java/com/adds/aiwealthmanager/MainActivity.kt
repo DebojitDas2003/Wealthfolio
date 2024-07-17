@@ -6,9 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navOptions
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import com.adds.aiwealthmanager.ui.theme.AIWealthManagerTheme
 
@@ -31,7 +33,7 @@ class MainActivity : ComponentActivity() {
                     composable("onboarding") { OnboardingScreen(navController, sharedPreferences) }
                     composable("homepage") { Homepage(navController) }
                     composable("profile") { ProfilePage(navController) }
-                    composable("notification") { NotificationPage(navController)}
+                    composable("notification") { NotificationPage(navController) }
                 }
             }
         }

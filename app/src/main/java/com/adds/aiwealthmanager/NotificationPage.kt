@@ -24,10 +24,10 @@ import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
 @Composable
 fun NotificationPage(navController: NavController) {
-    MaterialTheme{
+    MaterialTheme {
         Surface(color = DeepGreen,
             modifier = Modifier.fillMaxSize()) {
-            Column() {
+            Column {
                 Row(modifier = Modifier
                     .padding(10.dp)
                     .fillMaxWidth(),
@@ -42,9 +42,7 @@ fun NotificationPage(navController: NavController) {
                         fontWeight = FontWeight.Bold
                     )
 
-                    UserButton {
-
-                    }
+                    UserButton { navController.navigate("profile") }
                 }
             }
         }

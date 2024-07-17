@@ -21,12 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.adds.aiwealthmanager.ui.theme.DeepGreen
 import com.adds.aiwealthmanager.ui.theme.Purple40
+import com.adds.aiwealthmanager.ui.theme.poppinsFontFamily
 
 @Composable
 fun OnboardingScreen(navController: NavController, sharedPreferences: SharedPreferences) {
@@ -89,7 +91,10 @@ fun OnboardingScreen(navController: NavController, sharedPreferences: SharedPref
 fun WelcomeButton(onClick: () -> Unit) {
     Button(onClick = onClick,
         colors = ButtonDefaults.buttonColors(containerColor = Purple40)) {
-        Text(text = "Welcome")
+        Text(text = "Welcome",
+            color = Color.White,
+            fontFamily = poppinsFontFamily,
+            fontWeight = FontWeight.Bold,)
     }
 }
 
