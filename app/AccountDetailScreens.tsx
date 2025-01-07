@@ -45,12 +45,6 @@ export default function AccountDetailsScreen({
       >
         <ScrollView contentContainerStyle={styles.scrollContent}>
           <View style={styles.header}>
-            <TouchableOpacity
-              onPress={() => navigation.goBack()}
-              style={styles.backButton}
-            >
-              <Feather name="arrow-left" size={24} color="#2c3e50" />
-            </TouchableOpacity>
             <Text style={styles.title}>Enter Account Details</Text>
           </View>
 

@@ -98,16 +98,6 @@ export default function YourGoalProgressScreen({
 }: YourGoalProgressScreenProps) {
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Feather name="arrow-left" size={24} color="#2c3e50" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Your Goals</Text>
-      </View>
-
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {goals.map((goal) => (
           <GoalItem key={goal.id} goal={goal} />

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -15,21 +15,17 @@ type YourGoalsScreenProps = {
 }
 
 export default function YourGoalsScreen({ navigation }: YourGoalsScreenProps) {
+  const [goals, setGoals] = useState<string[]>([]) // Track user's goals
+
   const handleAddGoal = () => {
     console.log('Add a goal pressed')
-    // Implement goal addition logic here
+    // Implement goal addition logic here, e.g., add a goal to the list
+    setGoals([...goals, 'New Goal']) // Example of adding a goal
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Feather name="arrow-left" size={24} color="#2c3e50" />
-        </TouchableOpacity>
-      </View>
+      <View style={styles.header}></View>
 
       <View style={styles.content}>
         <Image
@@ -37,13 +33,26 @@ export default function YourGoalsScreen({ navigation }: YourGoalsScreenProps) {
           style={styles.illustration}
           resizeMode="contain"
         />
-
         <Text style={styles.title}>Your Goals</Text>
 
-        <TouchableOpacity style={styles.addGoalButton} onPress={handleAddGoal}>
-          <Text style={styles.addGoalButtonText}>Add a goal</Text>
-          <Text style={styles.addGoalButtonSubtext}>NOW</Text>
-        </TouchableOpacity>
+        {/* Conditional rendering based on whether there are goals */}
+        {goals.length === 0 ? (
+          <TouchableOpacity
+            style={styles.addGoalButton}
+            onPress={handleAddGoal}
+          >
+            <Text style={styles.addGoalButtonText}>Add a goal</Text>
+            <Text style={styles.addGoalButtonSubtext}>NOW</Text>
+          </TouchableOpacity>
+        ) : (
+          <View style={styles.goalList}>
+            {goals.map((goal, index) => (
+              <Text key={index} style={styles.goalItem}>
+                {goal}
+              </Text>
+            ))}
+          </View>
+        )}
       </View>
 
       <TouchableOpacity
@@ -102,6 +111,16 @@ const styles = StyleSheet.create({
   addGoalButtonSubtext: {
     color: '#ffffff',
     fontSize: 14,
+  },
+  goalList: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  goalItem: {
+    fontSize: 18,
+    color: '#2c3e50',
+    marginVertical: 5,
   },
   floatingActionButton: {
     position: 'absolute',

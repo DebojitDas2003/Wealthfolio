@@ -9,12 +9,34 @@ import {
   ScrollView,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
+import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useNavigation } from 'expo-router'
+
+type RootStackParamList = {
+  YourCardScreen: undefined
+  TotalDebtsScreen: undefined
+  AccountDetailScreens: undefined
+  UpdateUserProfileScreen: undefined
+  YourGoalsScreen: undefined
+  YourGoalsProgressScreen: undefined
+}
+
+type ProfileScreenNavigationProp = NativeStackNavigationProp<
+  RootStackParamList,
+  | 'YourCardScreen'
+  | 'TotalDebtsScreen'
+  | 'AccountDetailScreens'
+  | 'UpdateUserProfileScreen'
+  | 'YourGoalsScreen'
+  | 'YourGoalsProgressScreen'
+>
 
 export default function UserProfileScreen() {
+  const navigation = useNavigation<ProfileScreenNavigationProp>()
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>User Profile</Text>
+        <Text style={styles.title}>Profile</Text>
 
         <View style={styles.profileCard}>
           <Image
@@ -25,29 +47,37 @@ export default function UserProfileScreen() {
             <Text style={styles.username}>Username</Text>
             <Text style={styles.email}>@user.email</Text>
           </View>
-          <TouchableOpacity style={styles.editButton}>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('AccountDetailScreens')}
+          >
             <Feather name="edit-2" size={20} color="#ffffff" />
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('YourGoalsProgressScreen')}
+        >
           <Text style={styles.menuItemText}>Set your financial goals</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.menuItem}>
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('TotalDebtsScreen')}
+        >
           <Text style={styles.menuItemText}>Debt management</Text>
         </TouchableOpacity>
 
         <View style={styles.cardsSection}>
           <Text style={styles.cardsSectionTitle}>Cards</Text>
           <View style={styles.cardsContainer}>
-            <TouchableOpacity style={styles.card}>
+            <TouchableOpacity
+              style={styles.card}
+              onPress={() => navigation.navigate('YourCardScreen')}
+            >
               <Feather name="credit-card" size={24} color="#ffffff" />
               <Text style={styles.cardText}>DEBIT CARD</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.card}>
-              <Feather name="credit-card" size={24} color="#ffffff" />
-              <Text style={styles.cardText}>CREDIT CARD</Text>
             </TouchableOpacity>
           </View>
         </View>

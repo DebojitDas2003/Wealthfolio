@@ -39,10 +39,23 @@ export default function RootLayout() {
           options={{ headerShown: false, statusBarBackgroundColor: '#d4f5d4' }}
         />
         <Stack.Screen name="+not-found" />
-        <Stack.Screen name="AccountDetailScreen" />
-        <Stack.Screen name="DebitCardScreen" />
+        <Stack.Screen
+          name="AccountDetailScreen"
+          options={{
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }}
+        />
         <Stack.Screen name="RewardScreen" />
-        <Stack.Screen name="AccountDetailScreens" />
+        <Stack.Screen
+          name="AccountDetailScreens"
+          options={{
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }}
+        />
         <Stack.Screen name="AddNewCardScreen" />
         <Stack.Screen name="CreateAccountScreen" />
         <Stack.Screen name="ForgotPasswordScreen" />
@@ -60,7 +73,14 @@ export default function RootLayout() {
         <Stack.Screen name="TotalDebtsScreen" />
         <Stack.Screen name="UpdateUserProfileScreen" />
         <Stack.Screen name="YourAccountScreens" />
-        <Stack.Screen name="YourCardScreen" />
+        <Stack.Screen
+          name="YourCardScreen"
+          options={{
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }}
+        />
         <Stack.Screen name="YourGoalsProgressScreen" />
         <Stack.Screen name="YourGoalsScreen" />
         <Stack.Screen name="YourLoansScreen" />

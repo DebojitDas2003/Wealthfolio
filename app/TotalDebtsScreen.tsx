@@ -117,17 +117,17 @@ export default function TotalDebtsScreen({
             style={styles.pieChart}
             data={totalDebtsData}
             accessor="value" // Specify the field for the values
-            width={200} // Specify the chart width
+            width={350} // Specify the chart width
             height={200} // Specify the chart height
             chartConfig={{
-              backgroundColor: '#ffffff', // Background color in chartConfig
-              backgroundGradientFrom: '#ffffff',
-              backgroundGradientTo: '#ffffff',
+              backgroundColor: '#C3F9C8', // Background color in chartConfig
+              backgroundGradientFrom: '#C3F9C8',
+              backgroundGradientTo: '#C3F9C8',
               color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             }}
-            paddingLeft="15" // Add padding
+            paddingLeft="0" // Add padding
             absolute // Show absolute values
-            backgroundColor="#ffffff" // REQUIRED: Add this directly to PieChart
+            backgroundColor="#C3F9C8"
           />
         </View>
 
