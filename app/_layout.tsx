@@ -38,6 +38,14 @@ export default function RootLayout() {
           name="(tabs)"
           options={{ headerShown: false, statusBarBackgroundColor: '#d4f5d4' }}
         />
+        <Stack.Screen
+          name="(auth)"
+          options={{ headerShown: false, statusBarBackgroundColor: '#d4f5d4' }}
+        />
+        <Stack.Screen
+          name="index"
+          options={{ headerShown: false, statusBarBackgroundColor: '#d4f5d4' }}
+        />
         <Stack.Screen name="+not-found" />
         <Stack.Screen
           name="AccountDetailScreen"
