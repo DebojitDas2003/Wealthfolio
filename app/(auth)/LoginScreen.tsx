@@ -13,6 +13,7 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
+import { CLIENT_ID, CLIENT_SECRET } from '@env'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -42,7 +43,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        'http://127.0.0.1:5000/auth_redirect/signin',
+        'http://10.0.2.2:5000/auth_redirect/signin',
         {
           method: 'POST',
           headers: {
@@ -51,8 +52,8 @@ const Login = () => {
           body: JSON.stringify({
             Email: email,
             PasswordHash: password,
-            client_id: process.env.CLIENT_ID,
-            client_secret: process.env.CLIENT_SECRET,
+            client_id: CLIENT_ID,
+            client_secret: CLIENT_SECRET,
           }),
         }
       )
