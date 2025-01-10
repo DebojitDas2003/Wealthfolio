@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -6,7 +6,6 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
-  Image,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NavigationProp } from '@react-navigation/native'
@@ -22,20 +21,29 @@ type TransactionsScreenProps = {
   navigation: NavigationProp<any>
 }
 
-const transactions: Transaction[] = [
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-  { type: 'Paypal', date: 'Today', time: '10AM', amount: -1590 },
-]
-
 export default function TransactionsScreen({
   navigation,
 }: TransactionsScreenProps) {
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [balance, setBalance] = useState<number>(0)
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch(
+        'http://10.0.2.2:5000/transactions/transactions'
+      )
+      const data = await response.json()
+      setTransactions(data.transactions || []) // Ensure the API returns an array under `transactions`
+      setBalance(data.balance || 0) // If balance data is returned
+    } catch (error) {
+      console.error('Error fetching transactions:', error)
+    }
+  }
+
+  useEffect(() => {
+    fetchTransactions()
+  }, [])
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -57,18 +65,12 @@ export default function TransactionsScreen({
           <View style={styles.balanceContainer}>
             <Text style={styles.balanceLabel}>Your balance</Text>
             <View style={styles.balanceRow}>
-              <Text style={styles.balanceAmount}>$12,395</Text>
-              <Feather name="refresh-cw" size={20} color="#2c3e50" />
-            </View>
-          </View>
-          <View style={styles.cryptoContainer}>
-            <View style={styles.cryptoItem}>
-              <Feather name="dollar-sign" size={16} color="#4169E1" />
-              <Text style={styles.cryptoAmount}>$10,000</Text>
-            </View>
-            <View style={styles.cryptoItem}>
-              <Feather name="triangle" size={16} color="#FFD700" />
-              <Text style={styles.cryptoAmount}>$2,395</Text>
+              <Text style={styles.balanceAmount}>
+                ${balance.toLocaleString()}
+              </Text>
+              <TouchableOpacity onPress={fetchTransactions}>
+                <Feather name="refresh-cw" size={20} color="#2c3e50" />
+              </TouchableOpacity>
             </View>
           </View>
         </View>

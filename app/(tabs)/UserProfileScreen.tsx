@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { useNavigation } from 'expo-router'
+import { useNavigation } from '@react-navigation/native'
 
 type RootStackParamList = {
   YourCardScreen: undefined
@@ -32,28 +32,67 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 >
 
 export default function UserProfileScreen() {
-  const navigation = useNavigation<ProfileScreenNavigationProp>()
+  const navigation = useNavigation<ProfileScreenNavigationProp>() // Always call hooks at the top level
+
+  // State for user data
+  const [userData, setUserData] = useState({
+    username: 'Username',
+    email: 'user@example.com',
+  })
+
+  // Function to fetch data
+  const handleFetchData = async () => {
+    try {
+      const token = 'your_jwt_token_here' // Replace with actual token
+      const response = await fetch(
+        'http://10.0.2.2:5000/auth_redirect/profile',
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`)
+      }
+      const data = await response.json()
+      setUserData({
+        username: data.username || 'Username',
+        email: data.email || 'user@example.com',
+      })
+    } catch (error) {
+      if (error instanceof Error) {
+        console.error('Error fetching user data:', error.message)
+      } else {
+        console.error('Error fetching user data:', error)
+      }
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Profile</Text>
 
-        <View style={styles.profileCard}>
-          <Image
-            source={{ uri: 'https://example.com/profile-pic.jpg' }}
-            style={styles.profilePic}
-          />
-          <View style={styles.profileInfo}>
-            <Text style={styles.username}>Username</Text>
-            <Text style={styles.email}>@user.email</Text>
+        <TouchableOpacity onPress={handleFetchData}>
+          <View style={styles.profileCard}>
+            <Image
+              source={{ uri: 'https://example.com/profile-pic.jpg' }}
+              style={styles.profilePic}
+            />
+            <View style={styles.profileInfo}>
+              <Text style={styles.username}>{userData.username}</Text>
+              <Text style={styles.email}>{userData.email}</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => navigation.navigate('AccountDetailScreens')}
+            >
+              <Feather name="edit-2" size={20} color="#ffffff" />
+            </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.editButton}
-            onPress={() => navigation.navigate('AccountDetailScreens')}
-          >
-            <Feather name="edit-2" size={20} color="#ffffff" />
-          </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.menuItem}

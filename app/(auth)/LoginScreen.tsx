@@ -13,7 +13,6 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
-import { CLIENT_ID, CLIENT_SECRET } from '@env'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -52,8 +51,8 @@ const Login = () => {
           body: JSON.stringify({
             Email: email,
             PasswordHash: password,
-            client_id: CLIENT_ID,
-            client_secret: CLIENT_SECRET,
+            client_id: process.env.REACT_APP_CLIENT_ID,
+            client_secret: process.env.REACT_APP_CLIENT_SECRET,
           }),
         }
       )
