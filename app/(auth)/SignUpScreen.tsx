@@ -60,7 +60,7 @@ const SignUp = () => {
 
     try {
       const response = await fetch(
-        'http://10.0.2.2:5000/auth_redirect/signup',
+        'http://192.168.148.104:5000/auth_redirect/signup',
         {
           method: 'POST',
           headers: {

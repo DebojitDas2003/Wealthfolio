@@ -14,6 +14,9 @@ import {
 import { Feather } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import Config from 'react-native-config'
+import { Inter_400Regular } from '@expo-google-fonts/inter'
+import { Poppins_700Bold } from '@expo-google-fonts/poppins'
+import { useFonts } from 'expo-font'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -22,6 +25,11 @@ const Login = () => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
+
+  const [fontsLoaded, fontError] = useFonts({
+    Poppins_700Bold,
+    Inter_400Regular,
+  })
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -43,7 +51,7 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        'http://10.0.2.2:5000/auth_redirect/signin',
+        'http://192.168.148.104:5000/auth_redirect/signin',
         {
           method: 'POST',
           headers: {
@@ -52,8 +60,8 @@ const Login = () => {
           body: JSON.stringify({
             Email: email,
             PasswordHash: password,
-            client_id: Config.CLIENT_ID,
-            client_secret: Config.CLIENT_SECRET,
+            client_id: 'b4db3b7b-502e-4df3-88c4-f509093769c6',
+            client_secret: 'd541a27e-b873-4f69-9f6f-6c7553e86d16',
           }),
         }
       )
@@ -121,6 +129,12 @@ const Login = () => {
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={styles.forgotPassword}
+            onPress={() => router.push('/(tabs)/HomeScreen')}
+          >
+            <Text style={styles.forgotPasswordText}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}
@@ -163,9 +177,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 32,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    color: '#30A13C',
     marginBottom: 30,
+    fontFamily: 'Poppins_700Bold',
+    width: '90%',
   },
   inputContainer: {
     width: '100%',
@@ -174,6 +189,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     color: '#2c3e50',
+    left: 10,
     marginBottom: 5,
   },
   input: {
@@ -182,6 +198,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 25,
     paddingHorizontal: 20,
+    fontFamily: 'Inter_400Regular',
   },
   passwordContainer: {
     flexDirection: 'row',
@@ -209,7 +226,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 50,
     backgroundColor: '#34495e',
-    borderRadius: 25,
+    borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,

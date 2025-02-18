@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -10,19 +10,13 @@ import {
 } from 'react-native'
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { PieChart } from 'react-native-chart-kit'
-import { useNavigation } from 'expo-router'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-
-type RootStackParamList = {
-  Notifications: undefined
-  TransactionsScreen: undefined // Add other screens here if needed
-}
-
-type HomeScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  'Notifications',
-  'Transactions'
->
+import { useRouter } from 'expo-router'
+import {
+  useFonts,
+  Poppins_700Bold,
+  Poppins_400Regular,
+  Poppins_500Medium,
+} from '@expo-google-fonts/poppins'
 
 type Transaction = {
   type: string
@@ -32,12 +26,47 @@ type Transaction = {
 }
 
 export default function HomeScreen() {
-  const navigation = useNavigation<HomeScreenNavigationProp>()
+  const router = useRouter()
+
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  if (!fontsLoaded) {
+    return null
+  }
+
   const pieData = [
-    { name: 'Groceries', value: 30, color: '#FFA500' },
-    { name: 'Restaurant', value: 30, color: '#00CED1' },
-    { name: 'Cosmetics', value: 20, color: '#FF69B4' },
-    { name: 'Salon', value: 20, color: '#6A5ACD' },
+    {
+      name: 'Groceries',
+      value: 30,
+      color: '#FFA500',
+      strokeWidth: 2,
+      strokeColor: '#FFFFFF',
+    },
+    {
+      name: 'Restaurant',
+      value: 30,
+      color: '#00CED1',
+      strokeWidth: 2,
+      strokeColor: '#FFFFFF',
+    },
+    {
+      name: 'Cosmetics',
+      value: 20,
+      color: '#FF69B4',
+      strokeWidth: 2,
+      strokeColor: '#FFFFFF',
+    },
+    {
+      name: 'Salon',
+      value: 20,
+      color: '#6A5ACD',
+      strokeWidth: 2,
+      strokeColor: '#FFFFFF',
+    },
   ]
 
   const transactions: Transaction[] = [
@@ -50,17 +79,21 @@ export default function HomeScreen() {
   const greet = (): string => {
     const hour = new Date().getHours()
     if (hour > 8 && hour < 12) {
-      return 'GOOD MORNING!'
+      return 'GOOD\nMORNING!'
     } else if (hour === 12) {
-      return 'GOOD NOON!'
+      return 'GOOD\nNOON!'
     } else if (hour > 12 && hour < 18) {
-      return 'GOOD AFTERNOON!'
+      return 'GOOD\nAFTERNOON!'
     } else if (hour > 18 && hour < 20) {
-      return 'GOOD EVENING!'
+      return 'GOOD\nEVENING!'
     } else {
-      return 'GOOD NIGHT!'
+      return 'GOOD\nNIGHT!'
     }
   }
+
+  const calculator = require('../../assets/images/calculator.png')
+  const pie = require('../../assets/images/pie.png')
+  const bp = require('../../assets/images/bp.png')
 
   return (
     <SafeAreaView style={styles.container}>
@@ -72,9 +105,7 @@ export default function HomeScreen() {
           </View>
         </View>
         <View style={styles.headerIcons}>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('Notifications')}
-          >
+          <TouchableOpacity onPress={() => router.push('/Notifications')}>
             <Feather name="bell" size={24} color="black" style={styles.icon} />
           </TouchableOpacity>
 
@@ -90,17 +121,18 @@ export default function HomeScreen() {
           <View style={styles.chartContainer}>
             <PieChart
               data={pieData}
-              accessor="value" // Specify the field for the values
-              width={350} // Specify the chart width
-              height={200} // Specify the chart height
+              accessor="value"
+              width={350}
+              height={200}
               chartConfig={{
-                backgroundColor: '#C3F9C8', // Background color in chartConfig
+                backgroundColor: '#C3F9C8',
                 backgroundGradientFrom: '#C3F9C8',
                 backgroundGradientTo: '#C3F9C8',
                 color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                strokeWidth: 2,
               }}
-              paddingLeft="0" // Add padding
-              absolute // Show absolute values
+              paddingLeft="100"
+              absolute
               backgroundColor="#C3F9C8"
             />
 
@@ -112,20 +144,19 @@ export default function HomeScreen() {
         </View>
 
         <View style={styles.actionButtons}>
-          <TouchableOpacity style={styles.actionButton}>
-            <Feather name="plus" size={24} color="white" />
-            <Text style={styles.actionButtonText}>Add money</Text>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.push('/LoanCalculatorScreen')}
+          >
+            <Image source={calculator} style={{ height: 50, width: 50 }} />
+            <Text style={styles.actionButtonText}>EMI Calculator</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <MaterialCommunityIcons
-              name="cash-refund"
-              size={24}
-              color="white"
-            />
+            <Image source={pie} style={{ height: 50, width: 50 }} />
             <Text style={styles.actionButtonText}>Remaining budget</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.actionButton}>
-            <Feather name="trending-up" size={24} color="white" />
+            <Image source={bp} style={{ height: 50, width: 50 }} />
             <Text style={styles.actionButtonText}>Budget predictor</Text>
           </TouchableOpacity>
         </View>
@@ -151,7 +182,7 @@ export default function HomeScreen() {
         <View style={styles.lastTransaction}>
           <Text style={styles.lastTransactionTitle}>Last Transaction</Text>
           <TouchableOpacity
-            onPress={() => navigation.navigate('TransactionsScreen')}
+            onPress={() => router.push('/(tabs)/TransactionsScreen')}
           >
             <Text style={styles.viewAllText}>view all</Text>
           </TouchableOpacity>
@@ -223,10 +254,10 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   greeting: {
-    fontSize: 26,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+    fontSize: 35,
+    color: '#30A13C',
     marginBottom: 20,
+    fontFamily: 'Poppins_700Bold',
   },
   expensesCard: {
     backgroundColor: '#C3F9C8',
@@ -236,13 +267,17 @@ const styles = StyleSheet.create({
   },
   expensesTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
     marginBottom: 10,
+    textAlign: 'center',
+    fontFamily: 'Poppins_500Medium',
   },
   chartContainer: {
+    left: 20,
+    width: '80%',
     height: 200,
     justifyContent: 'center',
     alignItems: 'center',
+    overflow: 'hidden',
   },
 
   totalExpense: {
@@ -250,14 +285,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#C3F9C8', // Circular background color
-    borderRadius: 50, // Circular shape
-    width: 100, // Adjust size
-    height: 100, // Adjust size
+    borderRadius: 60, // Circular shape
+    width: 120, // Adjust size
+    height: 120, // Adjust size
     top: '50%', // Center vertically relative to the PieChart
     left: '50%', // Center horizontally relative to the PieChart
     transform: [
-      { translateX: -135 }, // Adjust horizontal center (half of width)
-      { translateY: -50 }, // Adjust vertical center (half of height)
+      { translateX: -48 }, // Adjust horizontal center (half of width)
+      { translateY: -60 }, // Adjust vertical center (half of height)
     ],
   },
 
@@ -276,7 +311,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   actionButton: {
-    backgroundColor: '#4CAF50',
+    backgroundColor: '#C3F9C8',
     borderRadius: 15,
     padding: 15,
     alignItems: 'center',
@@ -284,7 +319,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   actionButtonText: {
-    color: 'white',
+    color: '#1E1F4B',
     marginTop: 5,
     fontSize: 12,
     textAlign: 'center',
@@ -363,15 +398,15 @@ const styles = StyleSheet.create({
     padding: 10,
     justifyContent: 'space-between',
     alignItems: 'center',
-    position: 'absolute', // Make the view float
-    bottom: 10, // Position it above the bottom of the screen
-    left: 100, // Adjust the left position
-    right: 100, // Adjust the right position
-    shadowColor: '#000', // Add shadow for elevation
+    position: 'absolute',
+    bottom: 30,
+    left: 100,
+    right: 100,
+    shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
-    elevation: 5, // For Android elevation
+    elevation: 5,
   },
   scanOption: {
     justifyContent: 'center',
