@@ -117,7 +117,7 @@ const Login = () => {
                 <Feather
                   name={showPassword ? 'eye-off' : 'eye'}
                   size={24}
-                  color="#34495e"
+                  color="#1E1F4B"
                 />
               </TouchableOpacity>
             </View>
@@ -219,13 +219,13 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   forgotPasswordText: {
-    color: '#34495e',
+    color: '#1E1F4B',
     fontSize: 14,
   },
   button: {
     width: '100%',
     height: 50,
-    backgroundColor: '#34495e',
+    backgroundColor: '#1E1F4B',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -244,7 +244,7 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
   },
   signupLink: {
-    color: '#34495e',
+    color: '#1E1F4B',
     fontWeight: 'bold',
   },
   errorText: {

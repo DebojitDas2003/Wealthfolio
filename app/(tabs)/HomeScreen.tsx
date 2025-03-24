@@ -94,6 +94,8 @@ export default function HomeScreen() {
   const calculator = require('../../assets/images/calculator.png')
   const pie = require('../../assets/images/pie.png')
   const bp = require('../../assets/images/bp.png')
+  const mic = require('../../assets/images/mic.png')
+  const scan = require('../../assets/images/scan.png')
 
   return (
     <SafeAreaView style={styles.container}>
@@ -204,14 +206,14 @@ export default function HomeScreen() {
           ))}
         </View>
       </ScrollView>
-      <View style={styles.addWithScan}>
-        <View style={styles.scanOption}>
-          <Feather name="plus" size={20} color="white" />
-          <Text style={styles.addWithScanText}>Add Transaction</Text>
+      <View style={styles.buttonOverlay}>
+        <View style={styles.addWithScan}>
+          <Image source={mic} style={{ height: 30, width: 30 }} />
+          <Text style={styles.voiceText}>Add With{`\n`}voice</Text>
         </View>
-        <View style={styles.scanOption}>
-          <MaterialCommunityIcons name="qrcode-scan" size={20} color="white" />
-          <Text style={styles.addWithScanText}>Scan bill</Text>
+        <View style={styles.scanBill}>
+          <Text style={styles.ScanBillText}>Scan{`\n`}bill</Text>
+          <Image source={scan} style={{ height: 30, width: 30 }} />
         </View>
       </View>
     </SafeAreaView>
@@ -390,33 +392,55 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#4CAF50',
   },
-  addWithScan: {
-    width: 200,
+  buttonOverlay: {
     flexDirection: 'row',
-    backgroundColor: '#4CAF50',
-    borderRadius: 20,
-    padding: 10,
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
+    gap: 10,
     position: 'absolute',
     bottom: 30,
-    left: 100,
-    right: 100,
+    left: 20,
+    right: 20,
+  },
+  addWithScan: {
+    width: 120, // Maximum width for each button
+    backgroundColor: '#204A69',
+    padding: 10,
+    flexDirection: 'row', // Align icon and text horizontally
+    justifyContent: 'space-between',
+    alignItems: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 3,
     elevation: 5,
+    borderStartStartRadius: 50,
+    borderStartEndRadius: 50,
   },
-  scanOption: {
-    justifyContent: 'center',
+  scanBill: {
+    width: 120, // Maximum width for each button
+    backgroundColor: '#4CAF50',
+    padding: 10,
+    flexDirection: 'row', // Align icon and text horizontally
+    justifyContent: 'space-between',
     alignItems: 'center',
-    width: 100,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 3,
+    elevation: 5,
+    borderEndStartRadius: 50,
+    borderEndEndRadius: 50,
   },
-  addWithScanText: {
+
+  voiceText: {
     color: 'white',
-    justifyContent: 'center',
-    textAlign: 'center',
     marginLeft: 5,
+    textAlign: 'right',
+  },
+  ScanBillText: {
+    color: 'white',
+    marginLeft: 5,
+    textAlign: 'left',
   },
 })
