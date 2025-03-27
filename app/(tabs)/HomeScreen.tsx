@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
+  ActivityIndicator,
 } from 'react-native'
 import { Feather, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { PieChart } from 'react-native-chart-kit'
@@ -17,6 +18,7 @@ import {
   Poppins_400Regular,
   Poppins_500Medium,
 } from '@expo-google-fonts/poppins'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 type Transaction = {
   type: string
@@ -28,14 +30,36 @@ type Transaction = {
 export default function HomeScreen() {
   const router = useRouter()
 
+  // 1. ALL hooks at the top
   const [fontsLoaded] = useFonts({
     Poppins_700Bold,
     Poppins_400Regular,
     Poppins_500Medium,
   })
 
+  const [isLoading, setIsLoading] = useState(true)
+  const [userData, setUserData] = useState({
+    username: 'Loading...',
+    email: 'Loading...',
+  })
+
+  // 2. Add the missing useEffect hook
+  useEffect(() => {
+    if (fontsLoaded) {
+      handleFetchData()
+    }
+  }, [fontsLoaded])
+
+  // 3. Early return AFTER all hooks are defined
   if (!fontsLoaded) {
-    return null
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color="#30A13C" />
+          <Text style={styles.loadingText}>Loading fonts...</Text>
+        </View>
+      </SafeAreaView>
+    )
   }
 
   const pieData = [
@@ -97,13 +121,62 @@ export default function HomeScreen() {
   const mic = require('../../assets/images/mic.png')
   const scan = require('../../assets/images/scan.png')
 
+  const handleFetchData = async () => {
+    setIsLoading(true)
+    try {
+      const token = await AsyncStorage.getItem('access_token')
+      if (!token) {
+        console.error('No token found')
+        setUserData({
+          username: 'Authentication Error',
+          email: 'Please login again',
+        })
+        return
+      }
+
+      // Skip the non-working endpoint and go straight to the one that works
+      const CLIENT_ID = 'b4db3b7b-502e-4df3-88c4-f509093769c6'
+      const CLIENT_SECRET = 'd541a27e-b873-4f69-9f6f-6c7553e86d16'
+
+      const url = `http://192.168.114.85:5000/auth_redirect/profile?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP Error: ${response.status}`)
+      }
+
+      const data = await response.json()
+      console.log('Profile data received:', data)
+
+      setUserData({
+        username: data.username || 'No Name',
+        email: data.email || 'No Email',
+      })
+    } catch (error) {
+      console.error('Error fetching user data:', error)
+      setUserData({
+        username: 'Error loading data',
+        email: 'Please check connection',
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.userInfo}>
           <View>
             <Text style={styles.welcomeText}>Welcome Back 👋</Text>
-            <Text style={styles.userName}>Nicky Johnson</Text>
+            <Text style={styles.userName}>{userData.username}</Text>
           </View>
         </View>
         <View style={styles.headerIcons}>
@@ -442,5 +515,15 @@ const styles = StyleSheet.create({
     color: 'white',
     marginLeft: 5,
     textAlign: 'left',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#30A13C',
   },
 })

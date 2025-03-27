@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   View,
   Text,
@@ -7,11 +7,14 @@ import {
   Image,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
+// Define types and navigation params
 type RootStackParamList = {
   YourCardScreen: undefined
   TotalDebtsScreen: undefined
@@ -32,67 +35,103 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 >
 
 export default function UserProfileScreen() {
-  const navigation = useNavigation<ProfileScreenNavigationProp>() // Always call hooks at the top level
+  const navigation = useNavigation<ProfileScreenNavigationProp>()
 
-  // State for user data
   const [userData, setUserData] = useState({
-    username: 'Username',
-    email: 'user@example.com',
+    username: 'Loading...',
+    email: 'Loading...',
   })
+  const [isLoading, setIsLoading] = useState(true)
 
-  // Function to fetch data
+  // Function to fetch user data
   const handleFetchData = async () => {
+    setIsLoading(true)
     try {
-      const token = 'your_jwt_token_here' // Replace with actual token
-      const response = await fetch(
-        'http://10.0.2.2:5000/auth_redirect/profile',
-        {
-          method: 'GET',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      )
+      const token = await AsyncStorage.getItem('access_token')
+      if (!token) {
+        console.error('No token found')
+        setUserData({
+          username: 'Authentication Error',
+          email: 'Please login again',
+        })
+        return
+      }
+
+      // Skip the non-working endpoint and go straight to the one that works
+      const CLIENT_ID = 'b4db3b7b-502e-4df3-88c4-f509093769c6'
+      const CLIENT_SECRET = 'd541a27e-b873-4f69-9f6f-6c7553e86d16'
+
+      const url = `http://192.168.114.85:5000/auth_redirect/profile?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`
+
+      const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      })
+
       if (!response.ok) {
         throw new Error(`HTTP Error: ${response.status}`)
       }
+
       const data = await response.json()
+      console.log('Profile data received:', data)
+
       setUserData({
-        username: data.username || 'Username',
-        email: data.email || 'user@example.com',
+        username: data.username || 'No Name',
+        email: data.email || 'No Email',
       })
     } catch (error) {
-      if (error instanceof Error) {
-        console.error('Error fetching user data:', error.message)
-      } else {
-        console.error('Error fetching user data:', error)
-      }
+      console.error('Error fetching user data:', error)
+      setUserData({
+        username: 'Error loading data',
+        email: 'Please check connection',
+      })
+    } finally {
+      setIsLoading(false)
     }
   }
+
+  // Fetch user data when the screen loads
+  useEffect(() => {
+    handleFetchData()
+
+    // Add a refresh listener to reload data when the screen comes into focus
+    const unsubscribe = navigation.addListener('focus', () => {
+      handleFetchData()
+    })
+
+    return unsubscribe
+  }, [navigation])
 
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Profile</Text>
 
-        <TouchableOpacity onPress={handleFetchData}>
-          <View style={styles.profileCard}>
-            <Image
-              source={{ uri: 'https://example.com/profile-pic.jpg' }}
-              style={styles.profilePic}
-            />
-            <View style={styles.profileInfo}>
-              <Text style={styles.username}>{userData.username}</Text>
-              <Text style={styles.email}>{userData.email}</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.editButton}
-              onPress={() => navigation.navigate('AccountDetailScreens')}
-            >
-              <Feather name="edit-2" size={20} color="#ffffff" />
-            </TouchableOpacity>
+        <View style={styles.profileCard}>
+          <Image
+            source={{ uri: 'https://example.com/profile-pic.jpg' }}
+            style={styles.profilePic}
+          />
+          <View style={styles.profileInfo}>
+            <Text style={styles.username}>{userData.username}</Text>
+            <Text style={styles.email}>{userData.email}</Text>
           </View>
-        </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.editButton}
+            onPress={() => navigation.navigate('AccountDetailScreens')}
+          >
+            <Feather name="edit-2" size={20} color="#ffffff" />
+          </TouchableOpacity>
+        </View>
+
+        {isLoading && (
+          <View style={styles.loadingIndicator}>
+            <Text>Loading profile data...</Text>
+          </View>
+        )}
 
         <TouchableOpacity
           style={styles.menuItem}
@@ -108,24 +147,19 @@ export default function UserProfileScreen() {
           <Text style={styles.menuItemText}>Debt management</Text>
         </TouchableOpacity>
 
-        <View style={styles.cardsSection}>
-          <Text style={styles.cardsSectionTitle}>Cards</Text>
-          <View style={styles.cardsContainer}>
-            <TouchableOpacity
-              style={styles.card}
-              onPress={() => navigation.navigate('YourCardScreen')}
-            >
-              <Feather name="credit-card" size={24} color="#ffffff" />
-              <Text style={styles.cardText}>DEBIT CARD</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <TouchableOpacity
+          style={styles.refreshButton}
+          onPress={handleFetchData}
+        >
+          <Text style={styles.refreshButtonText}>Refresh Profile</Text>
+        </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
+  // Your existing styles...
   container: {
     flex: 1,
     backgroundColor: '#d4f5d4',
@@ -180,6 +214,23 @@ const styles = StyleSheet.create({
   menuItemText: {
     fontSize: 16,
     color: '#2c3e50',
+  },
+  // New styles
+  loadingIndicator: {
+    padding: 10,
+    alignItems: 'center',
+  },
+  refreshButton: {
+    backgroundColor: '#30A13C',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  refreshButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   cardsSection: {
     marginTop: 20,

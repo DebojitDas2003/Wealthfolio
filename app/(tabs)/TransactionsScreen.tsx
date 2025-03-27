@@ -6,15 +6,19 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
+  Alert,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NavigationProp } from '@react-navigation/native'
+import { router } from 'expo-router'
 
 type Transaction = {
+  id: number
   type: string
   date: string
   time: string
   amount: number
+  description: string
 }
 
 type TransactionsScreenProps = {
@@ -26,17 +30,30 @@ export default function TransactionsScreen({
 }: TransactionsScreenProps) {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [balance, setBalance] = useState<number>(0)
+  const [loading, setLoading] = useState<boolean>(false)
+
+  // TODO: In a real app, you would get the userId from your authentication context
+  const userId = '1' // Replace with actual user ID from auth context
 
   const fetchTransactions = async () => {
+    setLoading(true)
     try {
       const response = await fetch(
-        'http://10.0.2.2:5000/transactions/transactions'
+        `http://10.0.2.2:5000/transactions?user_id=${userId}`
       )
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch transactions')
+      }
+
       const data = await response.json()
-      setTransactions(data.transactions || []) // Ensure the API returns an array under `transactions`
-      setBalance(data.balance || 0) // If balance data is returned
+      setTransactions(data.transactions || [])
+      setBalance(data.balance || 0)
     } catch (error) {
       console.error('Error fetching transactions:', error)
+      Alert.alert('Error', 'Failed to load transactions')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -59,7 +76,9 @@ export default function TransactionsScreen({
             </View>
             <View style={styles.expenseCircle}>
               <Text style={styles.expenseLabel}>Your Expense</Text>
-              <Text style={styles.expenseAmount}>$2,004</Text>
+              <Text style={styles.expenseAmount}>
+                ${Math.abs(balance < 0 ? balance : 0).toLocaleString()}
+              </Text>
             </View>
           </View>
           <View style={styles.balanceContainer}>
@@ -68,8 +87,12 @@ export default function TransactionsScreen({
               <Text style={styles.balanceAmount}>
                 ${balance.toLocaleString()}
               </Text>
-              <TouchableOpacity onPress={fetchTransactions}>
-                <Feather name="refresh-cw" size={20} color="#2c3e50" />
+              <TouchableOpacity onPress={fetchTransactions} disabled={loading}>
+                <Feather
+                  name={loading ? 'loader' : 'refresh-cw'}
+                  size={20}
+                  color="#2c3e50"
+                />
               </TouchableOpacity>
             </View>
           </View>
@@ -82,22 +105,38 @@ export default function TransactionsScreen({
           </TouchableOpacity>
         </View>
 
+        {transactions.length === 0 && (
+          <View style={styles.emptyState}>
+            <Text style={styles.emptyStateText}>No transactions found</Text>
+          </View>
+        )}
+
         {transactions.map((transaction, index) => (
           <View key={index} style={styles.transactionItem}>
             <View>
-              <Text style={styles.transactionType}>{transaction.type}</Text>
+              <Text style={styles.transactionType}>
+                {transaction.description || transaction.type}
+              </Text>
               <Text style={styles.transactionDate}>
-                {transaction.date} | {transaction.time} | Deposit
+                {transaction.date} | {transaction.time}
               </Text>
             </View>
-            <Text style={styles.transactionAmount}>
+            <Text
+              style={[
+                styles.transactionAmount,
+                { color: transaction.amount < 0 ? '#e74c3c' : '#4CAF50' },
+              ]}
+            >
               ${Math.abs(transaction.amount).toLocaleString()}
             </Text>
           </View>
         ))}
 
-        <TouchableOpacity style={styles.filterButton}>
-          <Text style={styles.filterButtonText}>Filter</Text>
+        <TouchableOpacity
+          style={styles.filterButton}
+          onPress={() => router.push('/AddTransaction')}
+        >
+          <Text style={styles.filterButtonText}>Add Transaction</Text>
         </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
@@ -258,5 +297,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#4CAF50',
     borderRadius: 20,
     padding: 8,
+  },
+  emptyState: {
+    padding: 20,
+    alignItems: 'center',
+  },
+  emptyStateText: {
+    color: '#7f8c8d',
+    fontSize: 16,
   },
 })

@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Alert,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 
@@ -17,8 +18,12 @@ const SignUp = () => {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
   const router = useRouter()
+
+  const validateEmail = (email: string) => {
+    const emailRegex = /\S+@\S+\.\S+/
+    return emailRegex.test(email)
+  }
 
   const validatePassword = (password: string) => {
     const hasUpperCase = /[A-Z]/.test(password)
@@ -29,7 +34,6 @@ const SignUp = () => {
     const doesNotContainName =
       !password.toLowerCase().includes(firstName.toLowerCase()) &&
       !password.toLowerCase().includes(lastName.toLowerCase())
-
     return (
       hasUpperCase &&
       hasLowerCase &&
@@ -42,17 +46,23 @@ const SignUp = () => {
 
   const signUp = async () => {
     setLoading(true)
-    setError('')
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match.')
+      Alert.alert('Error', 'Passwords do not match.')
+      setLoading(false)
+      return
+    }
+
+    if (!validateEmail(email)) {
+      Alert.alert('Error', 'Please enter a valid email address.')
       setLoading(false)
       return
     }
 
     if (!validatePassword(password)) {
-      setError(
-        'Password must be at least 8 characters long, include uppercase, lowercase letters, a number, and a special character, and cannot contain your name.'
+      Alert.alert(
+        'Error',
+        'Password must be at least 8 characters long, include uppercase and lowercase letters, a number, a special character, and cannot contain your name.'
       )
       setLoading(false)
       return
@@ -60,11 +70,12 @@ const SignUp = () => {
 
     try {
       const response = await fetch(
-        'http://192.168.148.104:5000/auth_redirect/signup',
+        'http://192.168.114.85:5000/auth_redirect/signup',
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Accept: 'application/json',
           },
           body: JSON.stringify({
             FirstName: firstName,
@@ -82,17 +93,20 @@ const SignUp = () => {
       const result = await response.json()
 
       if (response.ok) {
-        alert('User account created!')
-        router.push('/(auth)/LoginScreen')
+        Alert.alert('Success', 'User account created!', [
+          { text: 'OK', onPress: () => router.push('/(auth)/LoginScreen') },
+        ])
       } else {
-        setError(`Registration failed: ${result.message}`)
+        Alert.alert(
+          'Registration Failed',
+          result.message || 'An error occurred during registration.'
+        )
       }
-    } catch (err) {
-      if (err instanceof Error) {
-        setError('Registration failed: ' + err.message)
-      } else {
-        setError('Registration failed: An unknown error occurred.')
-      }
+    } catch (error) {
+      Alert.alert(
+        'Registration Failed',
+        error instanceof Error ? error.message : 'An unknown error occurred.'
+      )
     } finally {
       setLoading(false)
     }
@@ -120,12 +134,15 @@ const SignUp = () => {
         placeholder="Phone Number"
         value={phoneNumber}
         onChangeText={setPhoneNumber}
+        keyboardType="phone-pad"
       />
       <TextInput
         style={styles.input}
         placeholder="Email"
         value={email}
         onChangeText={setEmail}
+        keyboardType="email-address"
+        autoCapitalize="none"
       />
       <TextInput
         style={styles.input}
@@ -148,7 +165,6 @@ const SignUp = () => {
           <Text style={styles.buttonText}>Create Account</Text>
         </TouchableOpacity>
       )}
-      {error ? <Text style={styles.errorText}>{error}</Text> : null}
       <View style={styles.footer}>
         <Text>Already have an account?</Text>
         <Text
@@ -176,6 +192,7 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginBottom: 20,
     color: '#2b822b',
+    textAlign: 'center',
   },
   input: {
     height: 50,
@@ -208,11 +225,6 @@ const styles = StyleSheet.create({
   },
   loader: {
     marginVertical: 20,
-  },
-  errorText: {
-    color: 'red',
-    marginTop: 10,
-    textAlign: 'center',
   },
   footer: {
     flexDirection: 'row',

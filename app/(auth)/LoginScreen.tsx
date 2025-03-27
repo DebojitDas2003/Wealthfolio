@@ -13,10 +13,10 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
-import Config from 'react-native-config'
-import { Inter_400Regular } from '@expo-google-fonts/inter'
-import { Poppins_700Bold } from '@expo-google-fonts/poppins'
 import { useFonts } from 'expo-font'
+import { Poppins_700Bold } from '@expo-google-fonts/poppins'
+import { Inter_400Regular } from '@expo-google-fonts/inter'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Login = () => {
   const [email, setEmail] = useState('')
@@ -30,6 +30,10 @@ const Login = () => {
     Poppins_700Bold,
     Inter_400Regular,
   })
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator style={styles.loader} />
+  }
 
   const isValidEmail = (email: string) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -51,12 +55,10 @@ const Login = () => {
 
     try {
       const response = await fetch(
-        'http://192.168.148.104:5000/auth_redirect/signin',
+        'http://192.168.114.85:5000/auth_redirect/signin',
         {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             Email: email,
             PasswordHash: password,
@@ -68,13 +70,23 @@ const Login = () => {
 
       const result = await response.json()
 
-      if (response.ok) {
+      if (response.ok && result.access_token) {
+        try {
+          await AsyncStorage.setItem('access_token', result.access_token)
+          console.log('Access Token Saved:', result.access_token)
+          const storedToken = await AsyncStorage.getItem('access_token')
+          console.log('Retrieved Token from Storage:', storedToken)
+        } catch (error) {
+          console.error('Error saving token:', error)
+        }
+
         router.push('../(tabs)/HomeScreen')
       } else {
-        setError(`Sign in failed: ${result.message}`)
+        console.error('No token received from backend:', result)
+        Alert.alert('Sign In Failed', result.message || 'Invalid credentials.')
       }
     } catch (err) {
-      setError('Sign in failed. Please check your network and try again.')
+      Alert.alert('Sign In Failed', 'Please check your network and try again.')
     } finally {
       setLoading(false)
     }
@@ -129,12 +141,6 @@ const Login = () => {
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.forgotPassword}
-            onPress={() => router.push('/(tabs)/HomeScreen')}
-          >
-            <Text style={styles.forgotPasswordText}>Home</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}
@@ -181,6 +187,7 @@ const styles = StyleSheet.create({
     marginBottom: 30,
     fontFamily: 'Poppins_700Bold',
     width: '90%',
+    textAlign: 'center',
   },
   inputContainer: {
     width: '100%',
@@ -189,8 +196,8 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     color: '#2c3e50',
-    left: 10,
     marginBottom: 5,
+    marginLeft: 10,
   },
   input: {
     width: '100%',
@@ -210,6 +217,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 50,
     paddingHorizontal: 20,
+    fontFamily: 'Inter_400Regular',
   },
   eyeIcon: {
     padding: 10,
@@ -254,5 +262,9 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: {
     backgroundColor: '#95a5a6',
+  },
+  loader: {
+    flex: 1,
+    justifyContent: 'center',
   },
 })
