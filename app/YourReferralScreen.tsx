@@ -9,6 +9,7 @@ import {
   ScrollView,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
+import { useFonts, Poppins_700Bold, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins'
 
 interface FriendItemProps {
   username: string
@@ -44,69 +45,70 @@ const ReferralProgramScreen: React.FC<ReferralProgramScreenProps> = ({
     console.log('Send link')
   }
 
+  // Load the Poppins fonts
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Feather name="arrow-left" size={24} color="#2c3e50" />
-        </TouchableOpacity>
-
         <View style={styles.content}>
           <Image
             source={require('@/assets/images/goal.jpg')}
             style={styles.giftIcon}
           />
-
           <Text style={styles.title}>
             1 week of Premium for you{'\n'}and for each of your friends
           </Text>
-
           <Text style={styles.subtitle}>
             Saving money is more fun and{'\n'}effective when you connect with
             {'\n'}friends
           </Text>
-
-          <View style={styles.referralCodeContainer}>
+          <View style={styles.referralContainer}>
             <Text style={styles.referralCodeLabel}>Your Referral Code :</Text>
             <Text style={styles.referralCode}>{referralCode}</Text>
+
+            <Text style={styles.shareLabel}>Share your link</Text>
+            <View style={styles.linkContainer}>
+              <Text style={styles.link} numberOfLines={1}>
+                {referralLink}
+              </Text>
+              <TouchableOpacity onPress={() => console.log('Copy link')}>
+                <Feather name="copy" size={20} color="#4CAF50" />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.whatsappButton}
+                onPress={handleWhatsappShare}
+              >
+                <Feather name="message-circle" size={20} color="#ffffff" />
+                <Text style={styles.buttonText}>Whatsapp</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.sendLinkButton}
+                onPress={handleSendLink}
+              >
+                <Feather name="share" size={20} color="#ffffff" />
+                <Text style={styles.buttonText}>Send link</Text>
+              </TouchableOpacity>
+            </View>
           </View>
-
-          <Text style={styles.shareLabel}>Share your link</Text>
-
-          <View style={styles.linkContainer}>
-            <Text style={styles.link} numberOfLines={1}>
-              {referralLink}
-            </Text>
-            <TouchableOpacity onPress={() => console.log('Copy link')}>
-              <Feather name="copy" size={20} color="#4CAF50" />
-            </TouchableOpacity>
-          </View>
-
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity
-              style={styles.whatsappButton}
-              onPress={handleWhatsappShare}
-            >
-              <Feather name="message-circle" size={20} color="#ffffff" />
-              <Text style={styles.buttonText}>Whatsapp</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.sendLinkButton}
-              onPress={handleSendLink}
-            >
-              <Feather name="share" size={20} color="#ffffff" />
-              <Text style={styles.buttonText}>Send link</Text>
-            </TouchableOpacity>
-          </View>
-
           <View style={styles.friendsSection}>
             <Text style={styles.friendsLabel}>Friends</Text>
             <Text style={styles.friendsCount}>2</Text>
           </View>
-
           <FriendItem username="Username" />
           <FriendItem username="Username" />
         </View>
@@ -122,15 +124,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d4f5d4',
   },
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#2c3e50',
+  },
   scrollContent: {
     flexGrow: 1,
     padding: 16,
-  },
-  backButton: {
-    width: 40,
-    height: 40,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
   content: {
     flex: 1,
@@ -144,34 +147,43 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     textAlign: 'center',
     marginBottom: 10,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 15,
+    fontFamily: 'Poppins_500Medium',
     color: '#34495e',
     textAlign: 'center',
     marginBottom: 20,
   },
-  referralCodeContainer: {
+  referralContainer: {
     marginBottom: 20,
+    alignItems: 'center',
+    backgroundColor: '#C3F9C8',
+    width: '100%',
+    borderRadius: 18,
+    paddingHorizontal: 10,
+    paddingTop: 10,
   },
   referralCodeLabel: {
     fontSize: 14,
+    fontFamily: 'Poppins_700Bold',
     color: '#34495e',
     textAlign: 'center',
-    marginBottom: 5,
   },
   referralCode: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     textAlign: 'center',
+    marginBottom: 5,
   },
   shareLabel: {
-    fontSize: 14,
+    fontSize: 15,
+    fontFamily: 'Poppins_500Medium',
     color: '#34495e',
     marginBottom: 5,
   },
@@ -187,6 +199,7 @@ const styles = StyleSheet.create({
   link: {
     flex: 1,
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#2c3e50',
     marginRight: 10,
   },
@@ -218,7 +231,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#ffffff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_500Medium',
+    fontSize: 14,
     marginLeft: 8,
   },
   friendsSection: {
@@ -230,13 +244,15 @@ const styles = StyleSheet.create({
   },
   friendsLabel: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
+    marginLeft: 5,
   },
   friendsCount: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
+    marginRight: 5,
   },
   friendItem: {
     flexDirection: 'row',
@@ -255,6 +271,7 @@ const styles = StyleSheet.create({
   },
   friendUsername: {
     fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
     color: '#2c3e50',
   },
 })

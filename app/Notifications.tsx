@@ -9,7 +9,12 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NavigationProp } from '@react-navigation/native'
-import DeleteGoalConfirmationModal from '../components/DeleteGoalModal' // Import the modal component
+import {
+  useFonts,
+  Poppins_700Bold,
+  Poppins_400Regular,
+  Poppins_500Medium,
+} from '@expo-google-fonts/poppins'
 
 type NotificationScreenProps = {
   navigation: NavigationProp<any>
@@ -36,25 +41,27 @@ const initialNotifications: NotificationItem[] = [
 ]
 
 export default function NotificationsScreen({ navigation }: NotificationScreenProps) {
-  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications)
-  const [notificationModalVisible, setNotificationModalVisible] = useState(false)
-  const [selectedIndex, setSelectedIndex] = useState<number | null>(null)
-  const [goalModalVisible, setGoalModalVisible] = useState(false)
+  // Call all hooks unconditionally
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
 
-  // Handler for deleting a notification
-  const handleNotificationDelete = () => {
-    if (selectedIndex !== null) {
-      const updatedNotifications = notifications.filter((_, index) => index !== selectedIndex)
-      setNotifications(updatedNotifications)
-      setNotificationModalVisible(false)
-      setSelectedIndex(null)
-    }
+  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications)
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
   }
 
-  // Handler for deleting a goal (or any other goal-related logic)
-  const handleGoalDelete = () => {
-    // Your goal delete logic here
-    setGoalModalVisible(false)
+  // Immediately delete notification without modal confirmation
+  const handleNotificationDelete = (indexToDelete: number) => {
+    const updatedNotifications = notifications.filter((_, index) => index !== indexToDelete)
+    setNotifications(updatedNotifications)
   }
 
   return (
@@ -64,14 +71,10 @@ export default function NotificationsScreen({ navigation }: NotificationScreenPr
           <View key={index} style={styles.notificationItem}>
             <Text style={styles.notificationTitle}>{item.title}</Text>
             <Text style={styles.notificationDescription}>{item.description}</Text>
-
             {/* Delete Button for Notification */}
             <TouchableOpacity
               style={styles.deleteButton}
-              onPress={() => {
-                setSelectedIndex(index)
-                setNotificationModalVisible(true)
-              }}
+              onPress={() => handleNotificationDelete(index)}
             >
               <Feather name="trash-2" size={20} color="white" />
               <Text style={styles.deleteButtonText}>Delete Notification</Text>
@@ -79,33 +82,6 @@ export default function NotificationsScreen({ navigation }: NotificationScreenPr
           </View>
         ))}
       </ScrollView>
-
-      {/* Button for Deleting a Goal */}
-      <View style={styles.goalDeleteContainer}>
-        <TouchableOpacity
-          style={styles.deleteButton}
-          onPress={() => setGoalModalVisible(true)}
-        >
-          <Feather name="trash-2" size={20} color="white" />
-          <Text style={styles.deleteButtonText}>Delete Goal</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Modal for Notification deletion */}
-      <DeleteGoalConfirmationModal
-        visible={notificationModalVisible}
-        onCancel={() => setNotificationModalVisible(false)}
-        onDelete={handleNotificationDelete}
-        itemName="notification"
-      />
-
-      {/* Modal for Goal deletion */}
-      <DeleteGoalConfirmationModal
-        visible={goalModalVisible}
-        onCancel={() => setGoalModalVisible(false)}
-        onDelete={handleGoalDelete}
-        itemName="goal"
-      />
     </SafeAreaView>
   )
 }
@@ -114,6 +90,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#d4f5d4',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
   },
   notificationList: {
     flex: 1,
@@ -132,12 +114,13 @@ const styles = StyleSheet.create({
   },
   notificationTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     marginBottom: 4,
   },
   notificationDescription: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#34495e',
   },
   deleteButton: {
@@ -151,11 +134,8 @@ const styles = StyleSheet.create({
   },
   deleteButtonText: {
     color: 'white',
+    fontFamily: 'Poppins_500Medium',
     fontWeight: 'bold',
     marginLeft: 8,
-  },
-  goalDeleteContainer: {
-    padding: 16,
-    alignItems: 'center',
   },
 })

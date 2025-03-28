@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { useFonts, Poppins_700Bold, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins';
 
 interface DeleteGoalModalProps {
   visible: boolean;
@@ -14,6 +15,15 @@ const DeleteGoalConfirmationModal: React.FC<DeleteGoalModalProps> = ({
   onDelete,
   itemName = "goal",
 }) => {
+  // Load the Poppins fonts
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  });
+
+  if (!fontsLoaded) return null;
+
   return (
     <Modal animationType="fade" transparent={true} visible={visible} onRequestClose={onCancel}>
       <View style={styles.centeredView}>
@@ -61,7 +71,8 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: 'center',
     fontSize: 20,
-    fontWeight: '600',
+    // Using Poppins_700Bold for a strong header
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e2c',
   },
   buttonContainer: {
@@ -84,13 +95,15 @@ const styles = StyleSheet.create({
   },
   cancelButtonText: {
     color: 'white',
-    fontWeight: '600',
     fontSize: 16,
+    // Using Poppins_500Medium for button text
+    fontFamily: 'Poppins_500Medium',
   },
   deleteButtonText: {
     color: 'white',
-    fontWeight: '600',
     fontSize: 16,
+    // Using Poppins_500Medium for button text
+    fontFamily: 'Poppins_500Medium',
   },
 });
 

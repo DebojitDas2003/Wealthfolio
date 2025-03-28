@@ -6,19 +6,23 @@ import {
   SafeAreaView,
   TouchableOpacity,
   ScrollView,
-  TextStyle,
+  Image,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NavigationProp } from '@react-navigation/native'
-
-type FeatherIconName = React.ComponentProps<typeof Feather>['name']
+import {
+  useFonts,
+  Poppins_700Bold,
+  Poppins_400Regular,
+  Poppins_500Medium,
+} from '@expo-google-fonts/poppins'
 
 type RewardsScreenProps = {
   navigation: NavigationProp<any>
 }
 
 type RewardItemProps = {
-  icon: FeatherIconName
+  icon: React.ComponentProps<typeof Feather>['name']
   label: string
   value: string | number
 }
@@ -32,62 +36,69 @@ const RewardItem = memo(({ icon, label, value }: RewardItemProps) => (
 ))
 
 type ActionBoxProps = {
-  icon: FeatherIconName
+  image?: any // optional image prop
   label: string
   value?: string | number
 }
 
-const ActionBox = memo(({ icon, label, value }: ActionBoxProps) => (
+const ActionBox = memo(({ image, label, value }: ActionBoxProps) => (
   <TouchableOpacity style={styles.actionBox}>
-    <Feather name={icon} size={24} color="#ffffff" />
-    <Text style={styles.actionLabel}>{label}</Text>
+    {image ? (
+      <Image source={image} style={styles.actionImage} />
+    ) : (
+      // Render a default icon if no image is provided
+      <View></View>
+    )}
     {value && <Text style={styles.actionValue}>{value}</Text>}
+    <Text style={styles.actionLabel}>{label}</Text>
   </TouchableOpacity>
 ))
 
 const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <TouchableOpacity
-            onPress={() => navigation.goBack()}
-            style={styles.backButton}
-          >
-            <Feather name="arrow-left" size={24} color="#2c3e50" />
-          </TouchableOpacity>
-          <Text style={styles.title}>Rewards</Text>
-        </View>
-
         {/* Icon Section */}
         <View style={styles.iconContainer}>
-          <View style={styles.iconCircle}>
-            <Feather name="refresh-cw" size={40} color="#FF9800" />
-            <View style={styles.handIcon}>
-              <Feather name="dollar-sign" size={24} color="#4CAF50" />
-            </View>
-          </View>
+          <Image
+            source={require('@/assets/images/rewards.png')}
+            style={styles.giftIcon}
+          />
         </View>
 
-        {/* Action Boxes */}
+        {/* Action Boxes with optional images */}
         <View style={styles.actionBoxesContainer}>
-          <ActionBox icon="check-square" label="Tasks" />
-          <ActionBox icon="star" label="Total Points" value="5553" />
-          <ActionBox icon="users" label="Refer and Earn" />
+          <ActionBox image={require('@/assets/images/tasks.png')} label="Tasks" />
+          <ActionBox  label="Total Points" value="5553" />
+          {/* This box doesn't provide an image so the default icon will show */}
+          <ActionBox image={require('@/assets/images/refer.png')} label="Refer and Earn" />
         </View>
 
         {/* Rewards Section */}
+        <Text style={styles.sectionTitle}>Rewards Earned</Text>
         <View style={styles.rewardsContainer}>
-          <Text style={styles.sectionTitle}>Rewards Earned</Text>
           <RewardItem icon="award" label="Free Days of Premium" value={28} />
           <RewardItem icon="user" label="Referral" value={14} />
           <RewardItem icon="dollar-sign" label="Points" value={7} />
         </View>
 
         {/* Redeem Section */}
+        <Text style={styles.sectionTitle}>Redeem Points</Text>
         <View style={styles.redeemContainer}>
-          <Text style={styles.sectionTitle}>Redeem Points</Text>
           {/* Add redeem options here */}
         </View>
       </ScrollView>
@@ -97,86 +108,72 @@ const RewardsScreen: React.FC<RewardsScreenProps> = ({ navigation }) => {
 
 export default RewardsScreen
 
-// Common text styles for reusability
-const textStyles = {
-  color: '#2c3e50',
-  fontWeight: 'bold' as TextStyle['fontWeight'],
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#E0F2E9',
+    backgroundColor: '#d4f5d4',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
+    color: '#2c3e50',
   },
   scrollContent: {
     flexGrow: 1,
     padding: 16,
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  title: {
-    ...textStyles,
-    fontSize: 24,
-  },
   iconContainer: {
     alignItems: 'center',
-    marginBottom: 20,
+    marginVertical: 10,
   },
-  iconCircle: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#ffffff',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  handIcon: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#ffffff',
-    borderRadius: 15,
-    padding: 5,
+  giftIcon: {
+    width: 100,
+    height: 100,
   },
   actionBoxesContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 30,
   },
   actionBox: {
-    backgroundColor: '#34495e',
+    backgroundColor: '#204A69',
     borderRadius: 8,
-    padding: 12,
+    paddingVertical: 12,
+    paddingHorizontal: 8,
     alignItems: 'center',
-    width: '30%',
+    width: '32%',
+    flexDirection: 'column',
+    justifyContent: 'space-between',
+  },
+  actionImage: {
+    width: 40,
+    height: 40,
   },
   actionLabel: {
     color: '#ffffff',
     fontSize: 12,
-    marginTop: 4,
+    marginTop: 8,
     textAlign: 'center',
+    fontFamily: 'Poppins_400Regular',
   },
   actionValue: {
     color: '#ffffff',
-    fontSize: 16,
+    fontSize: 20,
     fontWeight: 'bold',
-    marginTop: 4,
+    fontFamily: 'Poppins_500Medium',
   },
   rewardsContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#C3F9C8',
     borderRadius: 8,
     padding: 16,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   sectionTitle: {
-    ...textStyles,
     fontSize: 18,
+    fontFamily: 'Poppins_700Bold',
+    color: '#2c3e50',
     marginBottom: 12,
   },
   rewardItem: {
@@ -190,14 +187,17 @@ const styles = StyleSheet.create({
   rewardLabel: {
     flex: 1,
     fontSize: 16,
+    fontWeight: 'bold',
+    fontFamily: 'Poppins_500Medium',
     color: '#2c3e50',
   },
   rewardValue: {
-    ...textStyles,
-    fontSize: 16,
+    fontSize: 18,
+    fontFamily: 'Poppins_500Medium',
+    color: '#2c3e50',
   },
   redeemContainer: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#C3F9C8',
     borderRadius: 8,
     padding: 16,
   },

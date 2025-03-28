@@ -100,18 +100,19 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <View>
-            <Text style={styles.welcomeText}>Welcome Back 👋</Text>
-            <Text style={styles.userName}>Nicky Johnson</Text>
+        <View style={styles.headerCard}>
+          <View style={styles.userInfo}>
+            <View>
+              <Text style={styles.welcomeText}>Welcome Back 👋</Text>
+              <Text style={styles.userName}>Nicky Johnson</Text>
+            </View>
           </View>
-        </View>
-        <View style={styles.headerIcons}>
-          <TouchableOpacity onPress={() => router.push('/Notifications')}>
-            <Feather name="bell" size={24} color="black" style={styles.icon} />
-          </TouchableOpacity>
-
-          <Ionicons name="sync" size={24} color="black" style={styles.icon} />
+          <View style={styles.headerIcons}>
+            <TouchableOpacity onPress={() => router.push('/Notifications')}>
+              <Feather name="bell" size={24} color="black" style={styles.icon} />
+            </TouchableOpacity>
+            <Ionicons name="sync" size={24} color="black" style={styles.icon} />
+          </View>
         </View>
       </View>
 
@@ -137,7 +138,6 @@ export default function HomeScreen() {
               absolute
               backgroundColor="#C3F9C8"
             />
-
             <View style={styles.totalExpense}>
               <Text style={styles.totalExpenseLabel}>Total Expense</Text>
               <Text style={styles.totalExpenseValue}>7200</Text>
@@ -161,6 +161,20 @@ export default function HomeScreen() {
             <Image source={bp} style={{ height: 50, width: 50 }} />
             <Text style={styles.actionButtonText}>Budget predictor</Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.push('/RewardScreen')}
+          >
+            <Image source={calculator} style={{ height: 50, width: 50 }} />
+            <Text style={styles.actionButtonText}>Your Rewards</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.actionButton}
+            onPress={() => router.push('/YourReferralScreen')}
+          >
+            <Image source={calculator} style={{ height: 50, width: 50 }} />
+            <Text style={styles.actionButtonText}>Your Referrals</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.accountInfo}>
@@ -183,9 +197,7 @@ export default function HomeScreen() {
 
         <View style={styles.lastTransaction}>
           <Text style={styles.lastTransactionTitle}>Last Transaction</Text>
-          <TouchableOpacity
-            onPress={() => router.push('/(tabs)/TransactionsScreen')}
-          >
+          <TouchableOpacity onPress={() => router.push('/(tabs)/TransactionsScreen')}>
             <Text style={styles.viewAllText}>view all</Text>
           </TouchableOpacity>
         </View>
@@ -207,14 +219,18 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
       <View style={styles.buttonOverlay}>
-        <View style={styles.addWithScan}>
+        <TouchableOpacity style={styles.addWithScan}>
           <Image source={mic} style={{ height: 30, width: 30 }} />
-          <Text style={styles.voiceText}>Add With{`\n`}voice</Text>
-        </View>
-        <View style={styles.scanBill}>
-          <Text style={styles.ScanBillText}>Scan{`\n`}bill</Text>
+          <Text style={styles.voiceText}>
+            Add With{`\n`}voice
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.scanBill}>
+          <Text style={styles.ScanBillText}>
+            Scan{`\n`}bill
+          </Text>
           <Image source={scan} style={{ height: 30, width: 30 }} />
-        </View>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   )
@@ -229,24 +245,31 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
+    marginTop: 20,
+    padding: 20,
+    paddingBottom: 10,
+  },
+  headerCard: {
+    backgroundColor: '#C3F9C8',
+    borderRadius: 20,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 20,
-    padding: 20,
   },
   userInfo: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-
   welcomeText: {
-    fontSize: 18,
+    fontSize: 15,
     color: '#666',
+    fontFamily: 'Poppins_400Regular',
   },
   userName: {
     fontSize: 20,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#333',
   },
   headerIcons: {
@@ -258,7 +281,6 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 35,
     color: '#30A13C',
-    marginBottom: 20,
     fontFamily: 'Poppins_700Bold',
   },
   expensesCard: {
@@ -268,7 +290,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   expensesTitle: {
-    fontSize: 18,
+    fontSize: 20,
     marginBottom: 10,
     textAlign: 'center',
     fontFamily: 'Poppins_500Medium',
@@ -281,34 +303,31 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     overflow: 'hidden',
   },
-
   totalExpense: {
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#C3F9C8', // Circular background color
-    borderRadius: 60, // Circular shape
-    width: 120, // Adjust size
-    height: 120, // Adjust size
-    top: '50%', // Center vertically relative to the PieChart
-    left: '50%', // Center horizontally relative to the PieChart
-    transform: [
-      { translateX: -48 }, // Adjust horizontal center (half of width)
-      { translateY: -60 }, // Adjust vertical center (half of height)
-    ],
+    backgroundColor: '#C3F9C8',
+    borderRadius: 60,
+    width: 120,
+    height: 120,
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -48 }, { translateY: -60 }],
   },
-
   totalExpenseValue: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#000',
   },
   totalExpenseLabel: {
     fontSize: 12,
+    fontFamily: 'Poppins_400Regular',
     color: '#000',
   },
   actionButtons: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
@@ -317,14 +336,15 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 15,
     alignItems: 'center',
-    flex: 1,
-    marginHorizontal: 5,
+    width: '30%',
+    marginBottom: 10,
   },
   actionButtonText: {
     color: '#1E1F4B',
     marginTop: 5,
     fontSize: 12,
     textAlign: 'center',
+    fontFamily: 'Poppins_400Regular',
   },
   accountInfo: {
     backgroundColor: 'white',
@@ -334,7 +354,7 @@ const styles = StyleSheet.create({
   },
   accountInfoTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     marginBottom: 10,
   },
   balanceRow: {
@@ -348,48 +368,50 @@ const styles = StyleSheet.create({
   },
   balanceValue: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_500Medium',
     marginLeft: 5,
   },
-
   lastTransaction: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   lastTransactionTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
   },
   viewAllText: {
     color: '#4CAF50',
+    fontFamily: 'Poppins_400Regular',
   },
-
-  transactionContainer: { marginBottom: 80 },
-
+  transactionContainer: {
+    marginBottom: 60,
+  },
   transactionItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#ffffff',
     borderRadius: 8,
-    padding: 12,
-    marginHorizontal: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+
     marginBottom: 8,
   },
   transactionType: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
   },
   transactionDate: {
     fontSize: 12,
+    fontFamily: 'Poppins_400Regular',
     color: '#7f8c8d',
   },
   transactionAmount: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#4CAF50',
   },
   buttonOverlay: {
@@ -403,10 +425,11 @@ const styles = StyleSheet.create({
     right: 20,
   },
   addWithScan: {
-    width: 120, // Maximum width for each button
+    width: 120,
+    height: 50,
     backgroundColor: '#204A69',
     padding: 10,
-    flexDirection: 'row', // Align icon and text horizontally
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     shadowColor: '#000',
@@ -418,10 +441,11 @@ const styles = StyleSheet.create({
     borderStartEndRadius: 50,
   },
   scanBill: {
-    width: 120, // Maximum width for each button
+    width: 120,
+    height: 50,
     backgroundColor: '#4CAF50',
     padding: 10,
-    flexDirection: 'row', // Align icon and text horizontally
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     shadowColor: '#000',
@@ -432,15 +456,18 @@ const styles = StyleSheet.create({
     borderEndStartRadius: 50,
     borderEndEndRadius: 50,
   },
-
   voiceText: {
     color: 'white',
     marginLeft: 5,
     textAlign: 'right',
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
   },
   ScanBillText: {
     color: 'white',
     marginLeft: 5,
     textAlign: 'left',
+    fontFamily: 'Poppins_400Regular',
+    fontSize: 12,
   },
 })

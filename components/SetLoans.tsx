@@ -21,15 +21,23 @@ import {
 
 const { height } = Dimensions.get('window');
 
-interface SetGoalProps {
+interface SetLoanProps {
   visible: boolean;
   onClose: () => void;
-  onSave: (goalData: { description: string; budget: string }) => void;
+  onSave: (loanData: {
+    description: string;
+    amount: string;
+    interestRate: string;
+    duration: string;
+  }) => void;
 }
 
-const GoalBottomSheet: React.FC<SetGoalProps> = ({ visible, onClose, onSave }) => {
+const LoanBottomSheet: React.FC<SetLoanProps> = ({ visible, onClose, onSave }) => {
   const [description, setDescription] = useState('');
-  const [budget, setBudget] = useState('');
+  const [amount, setAmount] = useState('');
+  const [interestRate, setInterestRate] = useState('');
+  const [duration, setDuration] = useState('');
+
   const slideAnim = useRef(new Animated.Value(height)).current;
   const backdropOpacity = useRef(new Animated.Value(0)).current;
 
@@ -71,21 +79,31 @@ const GoalBottomSheet: React.FC<SetGoalProps> = ({ visible, onClose, onSave }) =
   }, [visible, slideAnim, backdropOpacity]);
 
   const handleSave = () => {
-    onSave({ description, budget });
+    onSave({
+      description,
+      amount,
+      interestRate,
+      duration,
+    });
     setDescription('');
-    setBudget('');
+    setAmount('');
+    setInterestRate('');
+    setDuration('');
   };
 
   const handleClose = () => {
     onClose();
     setDescription('');
-    setBudget('');
+    setAmount('');
+    setInterestRate('');
+    setDuration('');
   };
 
   if (!visible || !fontsLoaded) return null;
 
   return (
     <View style={styles.container}>
+      {/* Backdrop to dismiss modal */}
       <TouchableWithoutFeedback onPress={handleClose}>
         <Animated.View style={[styles.backdrop, { opacity: backdropOpacity }]} />
       </TouchableWithoutFeedback>
@@ -97,7 +115,7 @@ const GoalBottomSheet: React.FC<SetGoalProps> = ({ visible, onClose, onSave }) =
         <Animated.View style={[styles.bottomSheet, { transform: [{ translateY: slideAnim }] }]}>
           <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
             <View style={styles.contentContainer}>
-              <Text style={styles.title}>Set your goal</Text>
+              <Text style={styles.title}>Set your loan</Text>
               
               <TextInput
                 style={styles.input}
@@ -106,18 +124,36 @@ const GoalBottomSheet: React.FC<SetGoalProps> = ({ visible, onClose, onSave }) =
                 onChangeText={setDescription}
                 placeholderTextColor="#888"
               />
-              
+
               <TextInput
                 style={styles.input}
-                placeholder="Goal Budget"
-                value={budget}
-                onChangeText={setBudget}
+                placeholder="Amount"
+                value={amount}
+                onChangeText={setAmount}
                 keyboardType="numeric"
                 placeholderTextColor="#888"
               />
-              
+
+              <TextInput
+                style={styles.input}
+                placeholder="Interest Rate (%)"
+                value={interestRate}
+                onChangeText={setInterestRate}
+                keyboardType="numeric"
+                placeholderTextColor="#888"
+              />
+
+              <TextInput
+                style={styles.input}
+                placeholder="Loan Duration (in years)"
+                value={duration}
+                onChangeText={setDuration}
+                keyboardType="numeric"
+                placeholderTextColor="#888"
+              />
+
               <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-                <Text style={styles.saveButtonText}>Save goal</Text>
+                <Text style={styles.saveButtonText}>Save loan</Text>
               </TouchableOpacity>
             </View>
           </TouchableWithoutFeedback>
@@ -195,4 +231,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default GoalBottomSheet;
+export default LoanBottomSheet;

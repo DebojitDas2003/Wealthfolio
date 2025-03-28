@@ -10,6 +10,7 @@ import {
   Platform,
   SafeAreaView,
 } from 'react-native'
+import { useFonts, Poppins_700Bold, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins'
 
 interface Message {
   id: string
@@ -25,6 +26,21 @@ const AIScreen = () => {
 
   const flatListRef = useRef<FlatList<Message>>(null)
 
+  // Load Poppins fonts
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
+
   const handleSend = () => {
     if (userInput.trim()) {
       const userMessage: Message = {
@@ -35,7 +51,7 @@ const AIScreen = () => {
 
       setMessages((prevMessages) => [...prevMessages, userMessage])
 
-      // Simulate AI response (replace this with actual API call)
+      // Simulate AI response (replace with actual API call as needed)
       setTimeout(() => {
         const aiResponse: Message = {
           id: Date.now().toString(),
@@ -105,11 +121,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d4f5d4',
   },
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
+  },
   title: {
     fontSize: 24,
+    fontFamily: 'Poppins_700Bold',
     textAlign: 'center',
     marginTop: '10%',
-    fontWeight: 'bold',
     marginBottom: 20,
   },
   chatContainer: {
@@ -132,6 +154,7 @@ const styles = StyleSheet.create({
   },
   messageText: {
     color: '#fff',
+    fontFamily: 'Poppins_400Regular',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -149,6 +172,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginRight: 10,
     backgroundColor: '#fff',
+    fontFamily: 'Poppins_400Regular',
   },
   sendButton: {
     backgroundColor: '#0078fe',
@@ -158,6 +182,7 @@ const styles = StyleSheet.create({
   },
   sendButtonText: {
     color: '#fff',
+    fontFamily: 'Poppins_500Medium',
     fontWeight: 'bold',
   },
 })

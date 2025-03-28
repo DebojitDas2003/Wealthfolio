@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { PieChart } from 'react-native-chart-kit'
+import { useFonts, Poppins_700Bold, Poppins_400Regular, Poppins_500Medium } from '@expo-google-fonts/poppins'
 
 interface ExpenseItem {
   label: string
@@ -33,9 +34,23 @@ const aiInsights = [
 ]
 
 export default function InsightsScreen() {
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
+
   const pieData = expenseData.map((item) => ({
     name: item.label,
-    population: isNaN(item.value) ? 0 : item.value, // Ensure it's a valid number
+    population: isNaN(item.value) ? 0 : item.value,
     color: item.color,
     legendFontColor: '#2c3e50',
     legendFontSize: 15,
@@ -59,7 +74,7 @@ export default function InsightsScreen() {
               backgroundGradientTo: '#C3F9C8',
               color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             }}
-            accessor="population" // Use "population" as the field for values
+            accessor="population"
             backgroundColor="transparent"
             paddingLeft="15"
             hasLegend={true}
@@ -120,20 +135,21 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d4f5d4',
   },
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
+  },
   header: {
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
     marginTop: 20,
   },
-  profilePic: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
   },
   content: {
@@ -144,31 +160,29 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  chart: {
-    height: 200,
-  },
   totalExpense: {
     position: 'absolute',
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#d4f5d4', // Circular background color
-    borderRadius: 50, // Circular shape
-    width: 100, // Adjust size
-    height: 100, // Adjust size
-    top: '50%', // Center vertically relative to the PieChart
-    left: '50%', // Center horizontally relative to the PieChart
+    backgroundColor: '#d4f5d4',
+    borderRadius: 50,
+    width: 100,
+    height: 100,
+    top: '50%',
+    left: '50%',
     transform: [
-      { translateX: -122 }, // Adjust horizontal center (half of width)
-      { translateY: -50 }, // Adjust vertical center (half of height)
+      { translateX: -122 },
+      { translateY: -50 },
     ],
   },
   totalExpenseValue: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
   },
   totalExpenseLabel: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#7f8c8d',
   },
   expenseTable: {
@@ -181,7 +195,7 @@ const styles = StyleSheet.create({
   },
   tableHeaderText: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
   },
   expenseRow: {
@@ -203,16 +217,19 @@ const styles = StyleSheet.create({
   },
   expenseLabel: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#2c3e50',
   },
   expenseValue: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#2c3e50',
     flex: 1,
     textAlign: 'right',
   },
   expensePercentage: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#2c3e50',
     flex: 1,
     textAlign: 'right',
@@ -231,7 +248,7 @@ const styles = StyleSheet.create({
   },
   aiInsightsTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#ffffff',
   },
   aiInsightsList: {
@@ -248,6 +265,7 @@ const styles = StyleSheet.create({
   },
   aiInsightText: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#ffffff',
     flex: 1,
   },
@@ -269,3 +287,4 @@ const styles = StyleSheet.create({
     padding: 8,
   },
 })
+

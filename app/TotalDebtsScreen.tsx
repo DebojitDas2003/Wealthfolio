@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -11,8 +11,16 @@ import { Feather } from '@expo/vector-icons'
 import { PieChart } from 'react-native-chart-kit'
 import Svg, { Circle } from 'react-native-svg'
 import { NavigationProp } from '@react-navigation/native'
+import DeleteLoanConfirmationModal from '../components/DeleteLoanModal'
+import LoanBottomSheet from '../components/SetLoans'
+import {
+  useFonts,
+  Poppins_700Bold,
+  Poppins_400Regular,
+  Poppins_500Medium,
+} from '@expo-google-fonts/poppins'
 
-type TotalDebtsScreenprops = {
+type TotalDebtsScreenProps = {
   navigation: NavigationProp<any>
 }
 
@@ -24,9 +32,9 @@ interface Loan {
   percentage: number
 }
 
-const loans: Loan[] = [
+const initialLoans: Loan[] = [
   { id: '1', name: 'Home loan', amount: 7000, total: 8000, percentage: 87.5 },
-  { id: '2', name: 'Home loan', amount: 7000, total: 8000, percentage: 87.5 },
+  { id: '2', name: 'Car loan', amount: 15000, total: 20000, percentage: 75 },
 ]
 
 const totalDebtsData = [
@@ -68,7 +76,12 @@ const ProgressCircle = ({ percentage }: { percentage: number }) => {
   )
 }
 
-const LoanItem = ({ loan, isLast }: { loan: Loan; isLast: boolean }) => (
+type LoanItemProps = {
+  loan: Loan
+  onDelete: (id: string) => void
+}
+
+const LoanItem = ({ loan, onDelete }: LoanItemProps) => (
   <View style={styles.loanItem}>
     <View style={styles.loanHeader}>
       <Text style={styles.loanName}>{loan.name}</Text>
@@ -81,66 +94,119 @@ const LoanItem = ({ loan, isLast }: { loan: Loan; isLast: boolean }) => (
       </Text>
     </View>
     <View style={styles.loanActions}>
-      <TouchableOpacity style={styles.actionButton}>
+      <TouchableOpacity
+        style={styles.actionButton}
+        onPress={() => console.log(`Edit details for ${loan.id}`)}
+      >
         <Text style={styles.actionButtonText}>Edit details</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.actionButton}>
+      <TouchableOpacity
+        style={styles.actionButton}
+        onPress={() => onDelete(loan.id)}
+      >
         <Text style={styles.actionButtonText}>Delete</Text>
       </TouchableOpacity>
     </View>
-    {isLast && (
-      <TouchableOpacity style={styles.addButton}>
-        <Feather name="plus" size={24} color="#4CAF50" />
-      </TouchableOpacity>
-    )}
   </View>
 )
 
-export default function TotalDebtsScreen({
-  navigation,
-}: TotalDebtsScreenprops) {
+export default function TotalDebtsScreen({ navigation }: TotalDebtsScreenProps) {
+  // Load fonts
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  // Manage loans as state for dynamic updates
+  const [loans, setLoans] = useState<Loan[]>(initialLoans)
+  const [loanDeleteModalVisible, setLoanDeleteModalVisible] = useState(false)
+  const [selectedLoanId, setSelectedLoanId] = useState<string | null>(null)
+  const [loanSetModalVisible, setLoanSetModalVisible] = useState(false)
+
+  // Display loading screen until fonts are ready
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
+
+  const handleDeleteLoan = () => {
+    if (selectedLoanId) {
+      setLoans(loans.filter(loan => loan.id !== selectedLoanId))
+      setLoanDeleteModalVisible(false)
+      setSelectedLoanId(null)
+    }
+  }
+
+  const handlePressDelete = (id: string) => {
+    setSelectedLoanId(id)
+    setLoanDeleteModalVisible(true)
+  }
+
+  const handleSaveNewLoan = (loanData: { description: string; amount: string; interestRate: string; duration: string }) => {
+    // Create a new loan object.
+    const newLoan: Loan = {
+      id: Math.random().toString(),
+      name: loanData.description,
+      amount: parseFloat(loanData.amount),
+      total: parseFloat(loanData.amount), // Assume initial total equals amount.
+      percentage: 0,
+    }
+    setLoans([...loans, newLoan])
+    setLoanSetModalVisible(false)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Feather name="arrow-left" size={24} color="#2c3e50" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Your total debts</Text>
-      </View>
-
       <ScrollView contentContainerStyle={styles.content}>
         <View style={styles.totalDebtsChart}>
           <PieChart
             style={styles.pieChart}
             data={totalDebtsData}
-            accessor="value" // Specify the field for the values
-            width={350} // Specify the chart width
-            height={200} // Specify the chart height
+            accessor="value"
+            width={350}
+            height={200}
             chartConfig={{
-              backgroundColor: '#C3F9C8', // Background color in chartConfig
+              backgroundColor: '#C3F9C8',
               backgroundGradientFrom: '#C3F9C8',
               backgroundGradientTo: '#C3F9C8',
               color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
             }}
-            paddingLeft="0" // Add padding
-            absolute // Show absolute values
+            paddingLeft="0"
+            absolute
             backgroundColor="#C3F9C8"
           />
         </View>
 
         <Text style={styles.sectionTitle}>Your Loans</Text>
 
-        {loans.map((loan, index) => (
-          <LoanItem
-            key={loan.id}
-            loan={loan}
-            isLast={index === loans.length - 1}
-          />
+        {loans.map((loan) => (
+          <LoanItem key={loan.id} loan={loan} onDelete={handlePressDelete} />
         ))}
       </ScrollView>
+
+      {/* Floating plus button to open the Set Loan modal */}
+      <TouchableOpacity style={styles.floatingActionButton} onPress={() => setLoanSetModalVisible(true)}>
+        <Feather name="plus" size={24} color="#ffffff" />
+      </TouchableOpacity>
+
+      {/* Delete Loan Modal */}
+      <DeleteLoanConfirmationModal
+        visible={loanDeleteModalVisible}
+        onCancel={() => setLoanDeleteModalVisible(false)}
+        onDelete={handleDeleteLoan}
+        itemName="loan"
+      />
+
+      {/* Set Loan Modal */}
+      <LoanBottomSheet
+        visible={loanSetModalVisible}
+        onClose={() => setLoanSetModalVisible(false)}
+        onSave={handleSaveNewLoan}
+      />
     </SafeAreaView>
   )
 }
@@ -150,18 +216,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d4f5d4',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
   },
   content: {
     padding: 16,
@@ -175,7 +234,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     marginBottom: 16,
   },
@@ -193,7 +252,7 @@ const styles = StyleSheet.create({
   },
   loanName: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
   },
   loanDetails: {
@@ -203,12 +262,13 @@ const styles = StyleSheet.create({
   },
   loanPercentage: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#9C27B0',
     marginRight: 8,
   },
   loanAmount: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#7f8c8d',
   },
   loanActions: {
@@ -226,17 +286,17 @@ const styles = StyleSheet.create({
   actionButtonText: {
     color: '#ffffff',
     fontSize: 14,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_500Medium',
     textAlign: 'center',
   },
-  addButton: {
+  floatingActionButton: {
     position: 'absolute',
-    right: 16,
-    bottom: 16,
-    backgroundColor: '#ffffff',
-    borderRadius: 20,
-    width: 40,
-    height: 40,
+    right: 20,
+    bottom: 20,
+    backgroundColor: '#4CAF50',
+    borderRadius: 28,
+    width: 56,
+    height: 56,
     justifyContent: 'center',
     alignItems: 'center',
     elevation: 4,

@@ -8,9 +8,13 @@ import {
   SafeAreaView,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
+import { useFonts } from 'expo-font'
+import { Inter_400Regular } from '@expo-google-fonts/inter'
+import { Poppins_700Bold } from '@expo-google-fonts/poppins'
 
 type RootStackParamList = {
   LoginScreen: undefined
@@ -31,6 +35,20 @@ type Props = {
 export default function ForgotPasswordScreen({ navigation }: Props) {
   const [email, setEmail] = useState('')
 
+  // Load fonts
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Poppins_700Bold,
+  })
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#1E1F4B" />
+      </SafeAreaView>
+    )
+  }
+
   const handleResetPassword = () => {
     console.log('Reset password for:', email)
     // Implement password reset logic here
@@ -46,12 +64,10 @@ export default function ForgotPasswordScreen({ navigation }: Props) {
           <Text style={styles.title}>Forgot Password</Text>
 
           <Text style={styles.description}>
-            Oh sorry! Enter your email address below and we will send you a
-            reset link.
+            Oh sorry! Enter your email address below and we will send you a reset link.
           </Text>
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email Address</Text>
             <TextInput
               style={styles.input}
               placeholder="Enter your email"
@@ -90,41 +106,43 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-
   title: {
     marginTop: 50,
     fontSize: 24,
-    fontWeight: 'bold',
+    // Use Poppins_700Bold for the title
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     marginBottom: 10,
   },
   description: {
-    fontSize: 16,
+    fontSize: 15,
+    // Use Inter_400Regular for regular text
+    fontFamily: 'Inter_400Regular',
     color: '#34495e',
     marginBottom: 20,
   },
   inputContainer: {
     marginBottom: 20,
   },
-  label: {
-    fontSize: 14,
-    color: '#2c3e50',
-    marginBottom: 5,
-  },
   input: {
     backgroundColor: 'white',
     borderRadius: 10,
     padding: 15,
-    fontSize: 16,
+    fontSize: 15,
+    // Use Inter_400Regular for input text
+    fontFamily: 'Inter_400Regular',
   },
   rememberPasswordText: {
     fontSize: 14,
+    // Use Inter_400Regular for small texts
+    fontFamily: 'Inter_400Regular',
     color: '#34495e',
     marginBottom: 20,
   },
   clickHere: {
     color: '#2c3e50',
-    fontWeight: 'bold',
+    // Bold text for emphasis
+    fontFamily: 'Poppins_700Bold',
   },
   button: {
     backgroundColor: '#95a5a6',
@@ -135,6 +153,8 @@ const styles = StyleSheet.create({
   buttonText: {
     color: 'white',
     fontSize: 18,
+    // Use Inter_400Regular for button text (or switch to a bold font if desired)
+    fontFamily: 'Inter_400Regular',
     fontWeight: 'bold',
   },
 })
