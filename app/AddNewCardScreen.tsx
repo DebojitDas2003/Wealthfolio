@@ -92,15 +92,6 @@ export default function AddNewCardScreen({
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity
-          onPress={() => navigation.goBack()}
-          style={styles.backButton}
-        >
-          <Feather name="arrow-left" size={24} color="#2c3e50" />
-        </TouchableOpacity>
-        <Text style={styles.title}>Add New Card</Text>
-      </View>
 
       <View style={styles.cardPreview}>
         <Image
@@ -176,19 +167,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#d4f5d4',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
   },
   cardPreview: {
     alignItems: 'center',

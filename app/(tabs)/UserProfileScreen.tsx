@@ -12,6 +12,12 @@ import {
 import { Feather } from '@expo/vector-icons'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
+import {
+  useFonts,
+  Poppins_700Bold,
+  Poppins_400Regular,
+  Poppins_500Medium,
+} from '@expo-google-fonts/poppins'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // Define types and navigation params
@@ -37,10 +43,26 @@ type ProfileScreenNavigationProp = NativeStackNavigationProp<
 export default function UserProfileScreen() {
   const navigation = useNavigation<ProfileScreenNavigationProp>()
 
+  // Load Poppins fonts
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  // State for user data (moved above the conditional return)
   const [userData, setUserData] = useState({
     username: 'Loading...',
     email: 'Loading...',
   })
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
   const [isLoading, setIsLoading] = useState(true)
 
   // Function to fetch user data
@@ -164,13 +186,19 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d4f5d4',
   },
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
+  },
   scrollContent: {
     padding: 16,
   },
   title: {
     marginTop: 20,
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     marginBottom: 20,
     textAlign: 'center',
@@ -194,11 +222,12 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#ffffff',
   },
   email: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#ffffff',
     opacity: 0.8,
   },
@@ -213,6 +242,7 @@ const styles = StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
+    fontFamily: 'Poppins_400Regular',
     color: '#2c3e50',
   },
   // New styles
@@ -237,7 +267,7 @@ const styles = StyleSheet.create({
   },
   cardsSectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     marginBottom: 12,
   },
@@ -256,7 +286,7 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     marginTop: 8,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
   },
   navbar: {
     flexDirection: 'row',

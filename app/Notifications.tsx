@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   View,
   Text,
@@ -9,6 +9,12 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { NavigationProp } from '@react-navigation/native'
+import {
+  useFonts,
+  Poppins_700Bold,
+  Poppins_400Regular,
+  Poppins_500Medium,
+} from '@expo-google-fonts/poppins'
 
 type NotificationScreenProps = {
   navigation: NavigationProp<any>
@@ -19,7 +25,7 @@ type NotificationItem = {
   description: string
 }
 
-const notifications: NotificationItem[] = [
+const initialNotifications: NotificationItem[] = [
   {
     title: 'Electricity Bill',
     description: 'Electricity Bill of $500 pending on 22/07.',
@@ -34,18 +40,45 @@ const notifications: NotificationItem[] = [
   },
 ]
 
-export default function NotificationsScreen({
-  navigation,
-}: NotificationScreenProps) {
+export default function NotificationsScreen({ navigation }: NotificationScreenProps) {
+  // Call all hooks unconditionally
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
+  const [notifications, setNotifications] = useState<NotificationItem[]>(initialNotifications)
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
+
+  // Immediately delete notification without modal confirmation
+  const handleNotificationDelete = (indexToDelete: number) => {
+    const updatedNotifications = notifications.filter((_, index) => index !== indexToDelete)
+    setNotifications(updatedNotifications)
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.notificationList}>
         {notifications.map((item, index) => (
           <View key={index} style={styles.notificationItem}>
             <Text style={styles.notificationTitle}>{item.title}</Text>
-            <Text style={styles.notificationDescription}>
-              {item.description}
-            </Text>
+            <Text style={styles.notificationDescription}>{item.description}</Text>
+            {/* Delete Button for Notification */}
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleNotificationDelete(index)}
+            >
+              <Feather name="trash-2" size={20} color="white" />
+              <Text style={styles.deleteButtonText}>Delete Notification</Text>
+            </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
@@ -58,20 +91,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d4f5d4',
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#a8e6cf',
-  },
-  backButton: {
-    marginRight: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#2c3e50',
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
   },
   notificationList: {
     flex: 1,
@@ -90,12 +114,28 @@ const styles = StyleSheet.create({
   },
   notificationTitle: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     marginBottom: 4,
   },
   notificationDescription: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#34495e',
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#d9534f',
+    borderRadius: 8,
+    padding: 10,
+    marginTop: 10,
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontFamily: 'Poppins_500Medium',
+    fontWeight: 'bold',
+    marginLeft: 8,
   },
 })

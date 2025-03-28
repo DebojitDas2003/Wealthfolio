@@ -12,8 +12,14 @@ import {
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { router } from 'expo-router'
+import {
+  useFonts,
+  Poppins_700Bold,
+  Poppins_400Regular,
+  Poppins_500Medium,
+} from '@expo-google-fonts/poppins'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { jwtDecode } from 'jwt-decode' // Fixed import statement
+import { jwtDecode } from 'jwt-decode'
 
 type Transaction = {
   id: number
@@ -25,7 +31,7 @@ type Transaction = {
 }
 
 type JwtPayload = {
-  sub: string // user ID is typically in the 'sub' claim
+  sub: string
   exp: number
   iat: number
 }
@@ -37,21 +43,25 @@ export default function TransactionsScreen() {
   const [refreshing, setRefreshing] = useState<boolean>(false)
   const [userId, setUserId] = useState<string | null>(null)
 
+  const [fontsLoaded] = useFonts({
+    Poppins_700Bold,
+    Poppins_400Regular,
+    Poppins_500Medium,
+  })
+
   // Extract user ID from token on component mount
   useEffect(() => {
     const getUserIdFromToken = async () => {
       try {
         const token = await AsyncStorage.getItem('access_token')
         if (token) {
-          // Option 1: Decode the token to get user ID
           try {
-            const decoded = jwtDecode<JwtPayload>(token) // Fixed function call
+            const decoded = jwtDecode<JwtPayload>(token)
             setUserId(decoded.sub)
           } catch (error) {
             console.error('Error decoding token:', error)
           }
         } else {
-          // Handle the case when there's no token
           Alert.alert('Error', 'Not logged in. Please login first.')
           router.push('/(auth)/LoginScreen')
         }
@@ -160,141 +170,144 @@ export default function TransactionsScreen() {
     getUserName()
   }, [])
 
-  const testRootEndpoint = async () => {
-    try {
-      const response = await fetch('http://192.168.114.85:5000/')
-      const data = await response.json()
-      console.log('Root endpoint response:', data)
-      Alert.alert('Root Test', 'Works!')
-    } catch (error) {
-      console.error('Root endpoint error:', error)
-      Alert.alert('Root Test', 'Failed')
-    }
-  }
-
-  const testTransactionsEndpoint = async () => {
-    try {
-      const token = await AsyncStorage.getItem('access_token')
-      const response = await fetch(
-        'http://192.168.114.85:5000/transactions/test'
-      )
-      const data = await response.json()
-      console.log('Blueprint test endpoint response:', data)
-      Alert.alert('Blueprint Test', 'Works!')
-    } catch (error) {
-      console.error('Blueprint test endpoint error:', error)
-      Alert.alert('Blueprint Test', 'Failed')
-    }
-  }
-
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Transactions</Text>
-      </View>
+      {!fontsLoaded ? (
+        <ActivityIndicator
+          style={styles.loadingIndicator}
+          color="#4CAF50"
+          size="large"
+        />
+      ) : (
+        <>
+          <View style={styles.header}>
+            <Text style={styles.headerTitle}>Transactions</Text>
+          </View>
 
-      <ScrollView
-        style={styles.content}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-        }
-      >
-        <View style={styles.card}>
-          <View style={styles.cardHeader}>
-            <View>
-              <Text style={styles.greeting}>Hi {userName}</Text>
-              <Text style={styles.welcomeBack}>Welcome back</Text>
-            </View>
-            <View style={styles.expenseCircle}>
-              <Text style={styles.expenseLabel}>Your Expense</Text>
-              <Text style={styles.expenseAmount}>
-                ${Math.abs(balance < 0 ? balance : 0).toLocaleString()}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.balanceContainer}>
-            <Text style={styles.balanceLabel}>Your balance</Text>
-            <View style={styles.balanceRow}>
-              <Text style={styles.balanceAmount}>
-                ${balance.toLocaleString()}
-              </Text>
-              <TouchableOpacity onPress={fetchTransactions} disabled={loading}>
-                <Feather
-                  name={loading ? 'loader' : 'refresh-cw'}
-                  size={20}
-                  color="#ffffff"
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {loading ? (
-          <View style={styles.emptyState}>
-            <ActivityIndicator size="large" color="#4CAF50" />
-            <Text style={styles.emptyStateText}>Loading transactions...</Text>
-          </View>
-        ) : transactions.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Feather name="inbox" size={60} color="#7f8c8d" />
-            <Text style={styles.emptyStateText}>No transactions found</Text>
-            <Text style={styles.emptyStateSubText}>
-              Add your first transaction to get started
-            </Text>
-          </View>
-        ) : (
-          Object.entries(groupedTransactions).map(([date, dayTransactions]) => (
-            <View key={date}>
-              <View style={styles.transactionsHeader}>
-                <Text style={styles.transactionsTitle}>{date}</Text>
-              </View>
-
-              {dayTransactions.map((transaction, index) => (
-                <View
-                  key={transaction.id || index}
-                  style={styles.transactionItem}
-                >
-                  <View style={styles.transactionIcon}>
-                    <Feather
-                      name={
-                        transaction.amount < 0
-                          ? 'arrow-up-right'
-                          : 'arrow-down-left'
-                      }
-                      size={20}
-                      color={transaction.amount < 0 ? '#e74c3c' : '#4CAF50'}
-                    />
-                  </View>
-                  <View style={styles.transactionInfo}>
-                    <Text style={styles.transactionType}>
-                      {transaction.description || transaction.type}
-                    </Text>
-                    <Text style={styles.transactionDate}>
-                      {transaction.time}
-                    </Text>
-                  </View>
-                  <Text
-                    style={[
-                      styles.transactionAmount,
-                      { color: transaction.amount < 0 ? '#e74c3c' : '#4CAF50' },
-                    ]}
-                  >
-                    {transaction.amount < 0 ? '-' : '+'}$
-                    {Math.abs(transaction.amount).toLocaleString()}
+          <ScrollView
+            style={styles.content}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
+          >
+            <View style={styles.card}>
+              <View style={styles.cardHeader}>
+                <View>
+                  <Text style={styles.greeting}>Hi {userName}</Text>
+                  <Text style={styles.welcomeBack}>Welcome back</Text>
+                </View>
+                <View style={styles.expenseCircle}>
+                  <Text style={styles.expenseLabel}>Your Expense</Text>
+                  <Text style={styles.expenseAmount}>
+                    ${Math.abs(balance < 0 ? balance : 0).toLocaleString()}
                   </Text>
                 </View>
-              ))}
+              </View>
+              <View style={styles.balanceContainer}>
+                <Text style={styles.balanceLabel}>Your balance</Text>
+                <View style={styles.balanceRow}>
+                  <Text style={styles.balanceAmount}>
+                    ${balance.toLocaleString()}
+                  </Text>
+                  <TouchableOpacity
+                    onPress={fetchTransactions}
+                    disabled={loading}
+                  >
+                    <Feather
+                      name={loading ? 'loader' : 'refresh-cw'}
+                      size={20}
+                      color="#ffffff"
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          ))
-        )}
-      </ScrollView>
 
-      <TouchableOpacity
-        style={styles.addButton}
-        onPress={() => router.push('/AddTransaction')}
-      >
-        <Feather name="plus" size={24} color="#ffffff" />
-      </TouchableOpacity>
+            <View style={styles.transactionsHeader}>
+              <Text style={styles.transactionsTitle}>Your Transactions</Text>
+              <TouchableOpacity>
+                <Text style={styles.todayText}>Today</Text>
+              </TouchableOpacity>
+            </View>
+
+            {loading && transactions.length === 0 ? (
+              <View style={styles.emptyState}>
+                <ActivityIndicator size="large" color="#4CAF50" />
+                <Text style={styles.emptyStateText}>
+                  Loading transactions...
+                </Text>
+              </View>
+            ) : transactions.length === 0 ? (
+              <View style={styles.emptyState}>
+                <Feather name="inbox" size={60} color="#7f8c8d" />
+                <Text style={styles.emptyStateText}>No transactions found</Text>
+                <Text style={styles.emptyStateSubText}>
+                  Add your first transaction to get started
+                </Text>
+              </View>
+            ) : (
+              Object.entries(groupedTransactions).map(
+                ([date, dayTransactions]) => (
+                  <View key={date}>
+                    <View style={styles.dateHeader}>
+                      <Text style={styles.dateText}>{date}</Text>
+                    </View>
+
+                    {dayTransactions.map((transaction, index) => (
+                      <View
+                        key={transaction.id || index}
+                        style={styles.transactionItem}
+                      >
+                        <View style={styles.transactionIcon}>
+                          <Feather
+                            name={
+                              transaction.amount < 0
+                                ? 'arrow-up-right'
+                                : 'arrow-down-left'
+                            }
+                            size={20}
+                            color={
+                              transaction.amount < 0 ? '#e74c3c' : '#4CAF50'
+                            }
+                          />
+                        </View>
+                        <View style={styles.transactionInfo}>
+                          <Text style={styles.transactionType}>
+                            {transaction.description || transaction.type}
+                          </Text>
+                          <Text style={styles.transactionDate}>
+                            {transaction.time} |{' '}
+                            {transaction.amount < 0 ? 'Expense' : 'Income'}
+                          </Text>
+                        </View>
+                        <Text
+                          style={[
+                            styles.transactionAmount,
+                            {
+                              color:
+                                transaction.amount < 0 ? '#e74c3c' : '#4CAF50',
+                            },
+                          ]}
+                        >
+                          {transaction.amount < 0 ? '-' : '+'}$
+                          {Math.abs(transaction.amount).toLocaleString()}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )
+              )
+            )}
+          </ScrollView>
+
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => router.push('/AddTransaction')}
+          >
+            <Feather name="plus" size={24} color="#ffffff" />
+          </TouchableOpacity>
+        </>
+      )}
     </SafeAreaView>
   )
 }
@@ -304,13 +317,23 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#d4f5d4',
   },
+  loadingIndicator: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  loadingText: {
+    fontSize: 18,
+    fontFamily: 'Poppins_400Regular',
+    textAlign: 'center',
+    marginTop: 20,
+  },
   header: {
     alignItems: 'center',
     padding: 16,
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
     marginTop: 20,
   },
@@ -330,11 +353,12 @@ const styles = StyleSheet.create({
   },
   greeting: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#ffffff',
   },
   welcomeBack: {
     fontSize: 16,
+    fontFamily: 'Poppins_400Regular',
     color: '#ffffff',
   },
   expenseCircle: {
@@ -347,11 +371,12 @@ const styles = StyleSheet.create({
   },
   expenseLabel: {
     fontSize: 12,
+    fontFamily: 'Poppins_400Regular',
     color: '#2c3e50',
   },
   expenseAmount: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
   },
   balanceContainer: {
@@ -359,6 +384,7 @@ const styles = StyleSheet.create({
   },
   balanceLabel: {
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     color: '#ffffff',
   },
   balanceRow: {
@@ -368,7 +394,7 @@ const styles = StyleSheet.create({
   },
   balanceAmount: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#ffffff',
   },
   transactionsHeader: {
@@ -380,9 +406,24 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   transactionsTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 18,
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
+  },
+  todayText: {
+    fontSize: 14,
+    fontFamily: 'Poppins_500Medium',
+    color: '#4CAF50',
+  },
+  dateHeader: {
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    marginTop: 16,
+  },
+  dateText: {
+    fontSize: 14,
+    fontFamily: 'Poppins_500Medium',
+    color: '#7f8c8d',
   },
   transactionItem: {
     flexDirection: 'row',
@@ -407,16 +448,17 @@ const styles = StyleSheet.create({
   },
   transactionType: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
   },
   transactionDate: {
     fontSize: 12,
+    fontFamily: 'Poppins_400Regular',
     color: '#7f8c8d',
   },
   transactionAmount: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
   },
   addButton: {
     position: 'absolute',
@@ -443,29 +485,26 @@ const styles = StyleSheet.create({
   emptyStateText: {
     color: '#7f8c8d',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_500Medium',
     marginTop: 16,
   },
   emptyStateSubText: {
     color: '#7f8c8d',
     fontSize: 14,
+    fontFamily: 'Poppins_400Regular',
     textAlign: 'center',
     marginTop: 8,
   },
-  testContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 10,
-    marginTop: 10,
+  filterButton: {
+    backgroundColor: '#4CAF50',
+    borderRadius: 8,
+    padding: 12,
+    alignItems: 'center',
+    margin: 16,
   },
-  testButton: {
-    backgroundColor: '#1E1F4B',
-    padding: 10,
-    borderRadius: 5,
-    margin: 5,
-  },
-  testButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
+  filterButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontFamily: 'Poppins_500Medium',
   },
 })

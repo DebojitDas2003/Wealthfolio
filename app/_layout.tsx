@@ -55,7 +55,13 @@ export default function RootLayout() {
             statusBarBackgroundColor: '#d4f5d4',
           }}
         />
-        <Stack.Screen name="RewardScreen" />
+        <Stack.Screen name="RewardScreen" 
+        options={{
+          headerTitle: 'Rewards',
+          headerStyle: { backgroundColor: '#d4f5d4' },
+          headerTintColor: '#000000',
+          statusBarBackgroundColor: '#d4f5d4',
+        }} />
         <Stack.Screen
           name="AccountDetailScreens"
           options={{
@@ -67,7 +73,13 @@ export default function RootLayout() {
         <Stack.Screen name="AddNewCardScreen" />
         <Stack.Screen name="CreateAccountScreen" />
         <Stack.Screen name="ForgotPasswordScreen" />
-        <Stack.Screen name="LoanCalculatorScreen" />
+        <Stack.Screen name="LoanCalculatorScreen"
+          options={{
+            headerTitle: 'Loan Calculator',
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }} />
         <Stack.Screen name="LoanPaymentBreakDownScreen" />
         <Stack.Screen name="LoginScreen" />
         <Stack.Screen
@@ -78,21 +90,40 @@ export default function RootLayout() {
             statusBarBackgroundColor: '#d4f5d4',
           }}
         />
-        <Stack.Screen name="TotalDebtsScreen" />
+        <Stack.Screen name="TotalDebtsScreen"
+          options={{
+            headerTitle: 'Total Debts',
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }} />
         <Stack.Screen name="UpdateUserProfileScreen" />
         <Stack.Screen name="YourAccountScreens" />
         <Stack.Screen
           name="YourCardScreen"
           options={{
+            headerTitle: 'Your Cards',
             headerStyle: { backgroundColor: '#d4f5d4' },
             headerTintColor: '#000000',
             statusBarBackgroundColor: '#d4f5d4',
           }}
         />
-        <Stack.Screen name="YourGoalsProgressScreen" />
+        <Stack.Screen name="YourGoalsProgressScreen"
+          options={{
+            headerTitle: 'Your Goals',
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }} />
         <Stack.Screen name="YourGoalsScreen" />
         <Stack.Screen name="YourLoansScreen" />
-        <Stack.Screen name="YourReferralScreen" />
+        <Stack.Screen name="YourReferralScreen"
+        options={{
+          headerTitle: 'Referral',
+          headerStyle: { backgroundColor: '#d4f5d4' },
+          headerTintColor: '#000000',
+          statusBarBackgroundColor: '#d4f5d4',
+        }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>

@@ -10,6 +10,7 @@ import {
   Platform,
   ActivityIndicator,
   Alert,
+  Image,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
@@ -19,6 +20,12 @@ import { Inter_400Regular } from '@expo-google-fonts/inter'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Login = () => {
+  // Load both fonts
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Poppins_700Bold,
+  })
+
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -26,13 +33,12 @@ const Login = () => {
   const [error, setError] = useState('')
   const router = useRouter()
 
-  const [fontsLoaded, fontError] = useFonts({
-    Poppins_700Bold,
-    Inter_400Regular,
-  })
-
   if (!fontsLoaded) {
-    return <ActivityIndicator style={styles.loader} />
+    return (
+      <SafeAreaView style={styles.container}>
+        <ActivityIndicator size="large" color="#1E1F4B" />
+      </SafeAreaView>
+    )
   }
 
   const isValidEmail = (email: string) => {
@@ -99,8 +105,15 @@ const Login = () => {
         style={styles.keyboardAvoidingView}
       >
         <View style={styles.content}>
+          {/* Insert GIF at the top */}
+          <Image
+            source={require('@/assets/images/login.gif')}
+            style={styles.gifImage}
+          />
+
           <Text style={styles.title}>Log in</Text>
           {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email address</Text>
             <TextInput
@@ -112,6 +125,7 @@ const Login = () => {
               autoCapitalize="none"
             />
           </View>
+
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Password</Text>
             <View style={styles.passwordContainer}>
@@ -134,6 +148,7 @@ const Login = () => {
               </TouchableOpacity>
             </View>
           </View>
+
           <TouchableOpacity
             style={styles.forgotPassword}
             onPress={() => router.push('/ForgotPasswordScreen')}
@@ -151,6 +166,7 @@ const Login = () => {
               <Text style={styles.buttonText}>Log in</Text>
             )}
           </TouchableOpacity>
+
           <View style={styles.signupContainer}>
             <Text style={styles.signupText}>Don't have an account? </Text>
             <TouchableOpacity
@@ -181,13 +197,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     padding: 20,
   },
+  gifImage: {
+    width: 200,
+    height: 200,
+    marginBottom: 20,
+    resizeMode: 'contain',
+  },
   title: {
     fontSize: 32,
     color: '#30A13C',
-    marginBottom: 30,
+    marginBottom: 20,
     fontFamily: 'Poppins_700Bold',
     width: '90%',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   inputContainer: {
     width: '100%',
@@ -197,21 +219,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#2c3e50',
     marginBottom: 5,
+    fontFamily: 'Inter_400Regular',
     marginLeft: 10,
   },
   input: {
     width: '100%',
     height: 50,
     backgroundColor: 'white',
-    borderRadius: 25,
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 15,
     paddingHorizontal: 20,
     fontFamily: 'Inter_400Regular',
   },
   passwordContainer: {
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
     backgroundColor: 'white',
-    borderRadius: 25,
+    borderRadius: 15,
   },
   passwordInput: {
     flex: 1,
@@ -229,6 +256,7 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     color: '#1E1F4B',
     fontSize: 14,
+    fontFamily: 'Inter_400Regular',
   },
   button: {
     width: '100%',
@@ -243,6 +271,10 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Inter_400Regular',
+  },
+  buttonDisabled: {
+    backgroundColor: '#95a5a6',
   },
   signupContainer: {
     flexDirection: 'row',
@@ -250,18 +282,18 @@ const styles = StyleSheet.create({
   },
   signupText: {
     color: '#2c3e50',
+    fontFamily: 'Inter_400Regular',
   },
   signupLink: {
     color: '#1E1F4B',
     fontWeight: 'bold',
+    fontFamily: 'Inter_400Regular',
   },
   errorText: {
     color: 'red',
     fontSize: 14,
     marginBottom: 10,
-  },
-  buttonDisabled: {
-    backgroundColor: '#95a5a6',
+    fontFamily: 'Inter_400Regular',
   },
   loader: {
     flex: 1,

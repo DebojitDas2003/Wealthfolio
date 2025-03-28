@@ -6,23 +6,39 @@ import {
   TouchableOpacity,
   StyleSheet,
   ActivityIndicator,
+  Image,
   Alert,
 } from 'react-native'
+import { Feather } from '@expo/vector-icons'
+import { Inter_400Regular } from '@expo-google-fonts/inter'
+import { Poppins_700Bold } from '@expo-google-fonts/poppins'
+import { useFonts } from 'expo-font'
 import { useRouter } from 'expo-router'
 
 const SignUp = () => {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Poppins_700Bold,
+  })
+
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(false)
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
 
   const validateEmail = (email: string) => {
     const emailRegex = /\S+@\S+\.\S+/
     return emailRegex.test(email)
+  }
+
+  if (!fontsLoaded) {
+    return <ActivityIndicator size="large" color="#1E1F4B" />
   }
 
   const validatePassword = (password: string) => {
@@ -114,6 +130,11 @@ const SignUp = () => {
 
   return (
     <View style={styles.container}>
+      {/* Add GIF/illustration at the top */}
+      <Image
+        source={require('@/assets/images/registration.gif')} // Replace with your actual path
+        style={styles.gifImage}
+      />
       <Text style={styles.title}>Create Account</Text>
       <View style={styles.row}>
         <TextInput
@@ -144,20 +165,44 @@ const SignUp = () => {
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Confirm Password"
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        secureTextEntry
-      />
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Password"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry={!showPassword}
+        />
+        <TouchableOpacity
+          onPress={() => setShowPassword(!showPassword)}
+          style={styles.eyeIcon}
+        >
+          <Feather
+            name={showPassword ? 'eye-off' : 'eye'}
+            size={24}
+            color="#1E1F4B"
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.passwordContainer}>
+        <TextInput
+          style={styles.passwordInput}
+          placeholder="Confirm Password"
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          secureTextEntry={!showConfirmPassword}
+        />
+        <TouchableOpacity
+          onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          style={styles.eyeIcon}
+        >
+          <Feather
+            name={showConfirmPassword ? 'eye-off' : 'eye'}
+            size={24}
+            color="#1E1F4B"
+          />
+        </TouchableOpacity>
+      </View>
       {loading ? (
         <ActivityIndicator size="small" style={styles.loader} />
       ) : (
@@ -166,7 +211,7 @@ const SignUp = () => {
         </TouchableOpacity>
       )}
       <View style={styles.footer}>
-        <Text>Already have an account?</Text>
+        <Text style={styles.footerText}>Already have an account?</Text>
         <Text
           style={styles.link}
           onPress={() => router.push('/(auth)/LoginScreen')}
@@ -185,23 +230,51 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     justifyContent: 'center',
-    backgroundColor: '#D1FFD6',
+    backgroundColor: '#d4f5d4',
+  },
+  gifImage: {
+    width: 150,
+    height: 150,
+    marginBottom: 20,
+    alignSelf: 'center',
+    resizeMode: 'contain',
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    color: '#30A13C',
     marginBottom: 20,
-    color: '#2b822b',
+    fontFamily: 'Poppins_700Bold', // Specified, remains unchanged
+    width: '90%',
     textAlign: 'center',
   },
   input: {
     height: 50,
     borderWidth: 1,
     borderColor: '#ccc',
-    borderRadius: 10,
+    borderRadius: 15,
     paddingHorizontal: 10,
     marginBottom: 10,
     backgroundColor: '#fff',
+    fontFamily: 'Inter_400Regular', // Specified, remains unchanged
+  },
+  passwordContainer: {
+    height: 50,
+    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    backgroundColor: 'white',
+    borderRadius: 15,
+  },
+  passwordInput: {
+    flex: 1,
+    height: 50,
+    paddingHorizontal: 10,
+    fontFamily: 'Inter_400Regular',
+  },
+  eyeIcon: {
+    padding: 10,
   },
   row: {
     flexDirection: 'row',
@@ -222,19 +295,29 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'Inter_400Regular', // Added default
   },
   loader: {
     marginVertical: 20,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 10,
+    textAlign: 'center',
+    fontFamily: 'Inter_400Regular', // Added default
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
     marginTop: 20,
   },
+  footerText: {
+    fontFamily: 'Inter_400Regular', // Added default
+  },
   link: {
     color: '#1E1F4B',
     fontWeight: 'bold',
     marginLeft: 5,
-    textDecorationLine: 'underline',
+    fontFamily: 'Inter_400Regular', // Added default
   },
 })
