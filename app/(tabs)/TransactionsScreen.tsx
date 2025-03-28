@@ -7,10 +7,13 @@ import {
   TouchableOpacity,
   ScrollView,
   Alert,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native'
 import { Feather } from '@expo/vector-icons'
-import { NavigationProp } from '@react-navigation/native'
 import { router } from 'expo-router'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { jwtDecode } from 'jwt-decode' // Fixed import statement
 
 type Transaction = {
   id: number
@@ -21,32 +24,92 @@ type Transaction = {
   description: string
 }
 
-type TransactionsScreenProps = {
-  navigation: NavigationProp<any>
+type JwtPayload = {
+  sub: string // user ID is typically in the 'sub' claim
+  exp: number
+  iat: number
 }
 
-export default function TransactionsScreen({
-  navigation,
-}: TransactionsScreenProps) {
+export default function TransactionsScreen() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
   const [balance, setBalance] = useState<number>(0)
   const [loading, setLoading] = useState<boolean>(false)
+  const [refreshing, setRefreshing] = useState<boolean>(false)
+  const [userId, setUserId] = useState<string | null>(null)
 
-  // TODO: In a real app, you would get the userId from your authentication context
-  const userId = '1' // Replace with actual user ID from auth context
+  // Extract user ID from token on component mount
+  useEffect(() => {
+    const getUserIdFromToken = async () => {
+      try {
+        const token = await AsyncStorage.getItem('access_token')
+        if (token) {
+          // Option 1: Decode the token to get user ID
+          try {
+            const decoded = jwtDecode<JwtPayload>(token) // Fixed function call
+            setUserId(decoded.sub)
+          } catch (error) {
+            console.error('Error decoding token:', error)
+          }
+        } else {
+          // Handle the case when there's no token
+          Alert.alert('Error', 'Not logged in. Please login first.')
+          router.push('/(auth)/LoginScreen')
+        }
+      } catch (error) {
+        console.error('Error retrieving token:', error)
+      }
+    }
+
+    getUserIdFromToken()
+  }, [])
 
   const fetchTransactions = async () => {
+    if (!userId) {
+      console.log('No user ID available')
+      return
+    }
+
     setLoading(true)
     try {
-      const response = await fetch(
-        `http://10.0.2.2:5000/transactions?user_id=${userId}`
-      )
+      // Get the token from AsyncStorage
+      const token = await AsyncStorage.getItem('access_token')
+
+      if (!token) {
+        Alert.alert('Session Expired', 'Please login again')
+        router.push('/(auth)/LoginScreen')
+        return
+      }
+
+      console.log('Sending request to fetch transactions')
+
+      // Remove user_id from URL query parameter since we're using JWT
+      const response = await fetch('http://192.168.114.85:5000/transactions', {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          // Only include these if your middleware decorator requires them
+          'X-Client-ID': 'b4db3b7b-502e-4df3-88c4-f509093769c6',
+          'X-Client-Secret': 'd541a27e-b873-4f69-9f6f-6c7553e86d16',
+        },
+      })
+
+      console.log('Response status:', response.status)
+
+      if (response.status === 401) {
+        Alert.alert('Session Expired', 'Please login again')
+        await AsyncStorage.removeItem('access_token')
+        router.push('/(auth)/LoginScreen')
+        return
+      }
 
       if (!response.ok) {
-        throw new Error('Failed to fetch transactions')
+        const errorText = await response.text()
+        console.error('Error response:', errorText)
+        throw new Error(`Failed to fetch transactions: ${response.status}`)
       }
 
       const data = await response.json()
+      console.log('Transactions data:', data)
       setTransactions(data.transactions || [])
       setBalance(data.balance || 0)
     } catch (error) {
@@ -54,12 +117,75 @@ export default function TransactionsScreen({
       Alert.alert('Error', 'Failed to load transactions')
     } finally {
       setLoading(false)
+      setRefreshing(false)
     }
   }
 
+  // Fetch transactions when userId is available
   useEffect(() => {
+    if (userId) {
+      fetchTransactions()
+    }
+  }, [userId])
+
+  const onRefresh = () => {
+    setRefreshing(true)
     fetchTransactions()
+  }
+
+  // Helper function to group transactions by date
+  const groupedTransactions = transactions.reduce(
+    (groups: Record<string, Transaction[]>, transaction) => {
+      const date = transaction.date
+      if (!groups[date]) {
+        groups[date] = []
+      }
+      groups[date].push(transaction)
+      return groups
+    },
+    {}
+  )
+
+  // Get user name from AsyncStorage or use a default
+  const [userName, setUserName] = useState('User')
+  useEffect(() => {
+    const getUserName = async () => {
+      try {
+        const name = await AsyncStorage.getItem('user_name')
+        if (name) setUserName(name)
+      } catch (error) {
+        console.error('Error retrieving user name:', error)
+      }
+    }
+    getUserName()
   }, [])
+
+  const testRootEndpoint = async () => {
+    try {
+      const response = await fetch('http://192.168.114.85:5000/')
+      const data = await response.json()
+      console.log('Root endpoint response:', data)
+      Alert.alert('Root Test', 'Works!')
+    } catch (error) {
+      console.error('Root endpoint error:', error)
+      Alert.alert('Root Test', 'Failed')
+    }
+  }
+
+  const testTransactionsEndpoint = async () => {
+    try {
+      const token = await AsyncStorage.getItem('access_token')
+      const response = await fetch(
+        'http://192.168.114.85:5000/transactions/test'
+      )
+      const data = await response.json()
+      console.log('Blueprint test endpoint response:', data)
+      Alert.alert('Blueprint Test', 'Works!')
+    } catch (error) {
+      console.error('Blueprint test endpoint error:', error)
+      Alert.alert('Blueprint Test', 'Failed')
+    }
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -67,11 +193,16 @@ export default function TransactionsScreen({
         <Text style={styles.headerTitle}>Transactions</Text>
       </View>
 
-      <ScrollView style={styles.content}>
+      <ScrollView
+        style={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
         <View style={styles.card}>
           <View style={styles.cardHeader}>
             <View>
-              <Text style={styles.greeting}>Hi User</Text>
+              <Text style={styles.greeting}>Hi {userName}</Text>
               <Text style={styles.welcomeBack}>Welcome back</Text>
             </View>
             <View style={styles.expenseCircle}>
@@ -91,54 +222,79 @@ export default function TransactionsScreen({
                 <Feather
                   name={loading ? 'loader' : 'refresh-cw'}
                   size={20}
-                  color="#2c3e50"
+                  color="#ffffff"
                 />
               </TouchableOpacity>
             </View>
           </View>
         </View>
 
-        <View style={styles.transactionsHeader}>
-          <Text style={styles.transactionsTitle}>Your Transactions</Text>
-          <TouchableOpacity>
-            <Text style={styles.todayText}>Today</Text>
-          </TouchableOpacity>
-        </View>
-
-        {transactions.length === 0 && (
+        {loading ? (
           <View style={styles.emptyState}>
-            <Text style={styles.emptyStateText}>No transactions found</Text>
+            <ActivityIndicator size="large" color="#4CAF50" />
+            <Text style={styles.emptyStateText}>Loading transactions...</Text>
           </View>
-        )}
-
-        {transactions.map((transaction, index) => (
-          <View key={index} style={styles.transactionItem}>
-            <View>
-              <Text style={styles.transactionType}>
-                {transaction.description || transaction.type}
-              </Text>
-              <Text style={styles.transactionDate}>
-                {transaction.date} | {transaction.time}
-              </Text>
-            </View>
-            <Text
-              style={[
-                styles.transactionAmount,
-                { color: transaction.amount < 0 ? '#e74c3c' : '#4CAF50' },
-              ]}
-            >
-              ${Math.abs(transaction.amount).toLocaleString()}
+        ) : transactions.length === 0 ? (
+          <View style={styles.emptyState}>
+            <Feather name="inbox" size={60} color="#7f8c8d" />
+            <Text style={styles.emptyStateText}>No transactions found</Text>
+            <Text style={styles.emptyStateSubText}>
+              Add your first transaction to get started
             </Text>
           </View>
-        ))}
+        ) : (
+          Object.entries(groupedTransactions).map(([date, dayTransactions]) => (
+            <View key={date}>
+              <View style={styles.transactionsHeader}>
+                <Text style={styles.transactionsTitle}>{date}</Text>
+              </View>
 
-        <TouchableOpacity
-          style={styles.filterButton}
-          onPress={() => router.push('/AddTransaction')}
-        >
-          <Text style={styles.filterButtonText}>Add Transaction</Text>
-        </TouchableOpacity>
+              {dayTransactions.map((transaction, index) => (
+                <View
+                  key={transaction.id || index}
+                  style={styles.transactionItem}
+                >
+                  <View style={styles.transactionIcon}>
+                    <Feather
+                      name={
+                        transaction.amount < 0
+                          ? 'arrow-up-right'
+                          : 'arrow-down-left'
+                      }
+                      size={20}
+                      color={transaction.amount < 0 ? '#e74c3c' : '#4CAF50'}
+                    />
+                  </View>
+                  <View style={styles.transactionInfo}>
+                    <Text style={styles.transactionType}>
+                      {transaction.description || transaction.type}
+                    </Text>
+                    <Text style={styles.transactionDate}>
+                      {transaction.time}
+                    </Text>
+                  </View>
+                  <Text
+                    style={[
+                      styles.transactionAmount,
+                      { color: transaction.amount < 0 ? '#e74c3c' : '#4CAF50' },
+                    ]}
+                  >
+                    {transaction.amount < 0 ? '-' : '+'}$
+                    {Math.abs(transaction.amount).toLocaleString()}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          ))
+        )}
       </ScrollView>
+
+      <TouchableOpacity
+        style={styles.addButton}
+        onPress={() => router.push('/AddTransaction')}
+      >
+        <Feather name="plus" size={24} color="#ffffff" />
+      </TouchableOpacity>
     </SafeAreaView>
   )
 }
@@ -152,7 +308,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 16,
   },
-
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -216,44 +371,39 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#ffffff',
   },
-  cryptoContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  cryptoItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  cryptoAmount: {
-    marginLeft: 4,
-    fontSize: 16,
-    color: '#ffffff',
-  },
   transactionsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    marginBottom: 12,
+    marginTop: 16,
+    marginBottom: 8,
   },
   transactionsTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#2c3e50',
   },
-  todayText: {
-    fontSize: 14,
-    color: '#4CAF50',
-  },
   transactionItem: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 12,
+    padding: 16,
     marginHorizontal: 16,
     marginBottom: 8,
+  },
+  transactionIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  transactionInfo: {
+    flex: 1,
   },
   transactionType: {
     fontSize: 16,
@@ -267,43 +417,55 @@ const styles = StyleSheet.create({
   transactionAmount: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: '#4CAF50',
   },
-  filterButton: {
+  addButton: {
+    position: 'absolute',
+    right: 20,
+    bottom: 20,
+    width: 60,
+    height: 60,
+    borderRadius: 30,
     backgroundColor: '#4CAF50',
-    borderRadius: 8,
-    padding: 16,
-    margin: 16,
+    justifyContent: 'center',
     alignItems: 'center',
-  },
-  filterButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  navItemActive: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 20,
-    padding: 8,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   emptyState: {
-    padding: 20,
     alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 60,
+    paddingHorizontal: 20,
   },
   emptyStateText: {
     color: '#7f8c8d',
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginTop: 16,
+  },
+  emptyStateSubText: {
+    color: '#7f8c8d',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 8,
+  },
+  testContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 10,
+    marginTop: 10,
+  },
+  testButton: {
+    backgroundColor: '#1E1F4B',
+    padding: 10,
+    borderRadius: 5,
+    margin: 5,
+  },
+  testButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 })
