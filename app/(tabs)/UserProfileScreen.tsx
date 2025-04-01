@@ -50,19 +50,11 @@ export default function UserProfileScreen() {
     Poppins_500Medium,
   })
 
-  // State for user data (moved above the conditional return)
+  // Declare all hooks at the top level of the component
   const [userData, setUserData] = useState({
     username: 'Loading...',
     email: 'Loading...',
   })
-
-  if (!fontsLoaded) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text style={styles.loadingText}>Loading...</Text>
-      </SafeAreaView>
-    )
-  }
   const [isLoading, setIsLoading] = useState(true)
 
   // Function to fetch user data
@@ -79,10 +71,9 @@ export default function UserProfileScreen() {
         return
       }
 
-      // Skip the non-working endpoint and go straight to the one that works
+      // Use working endpoint
       const CLIENT_ID = 'b4db3b7b-502e-4df3-88c4-f509093769c6'
       const CLIENT_SECRET = 'd541a27e-b873-4f69-9f6f-6c7553e86d16'
-
       const url = `http://192.168.114.85:5000/auth_redirect/profile?client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}`
 
       const response = await fetch(url, {
@@ -126,6 +117,15 @@ export default function UserProfileScreen() {
 
     return unsubscribe
   }, [navigation])
+
+  // Conditionally render loading state for fonts AFTER all hooks have been declared
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.loadingText}>Loading...</Text>
+      </SafeAreaView>
+    )
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -181,7 +181,6 @@ export default function UserProfileScreen() {
 }
 
 const styles = StyleSheet.create({
-  // Your existing styles...
   container: {
     flex: 1,
     backgroundColor: '#d4f5d4',
@@ -245,7 +244,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Poppins_400Regular',
     color: '#2c3e50',
   },
-  // New styles
   loadingIndicator: {
     padding: 10,
     alignItems: 'center',
