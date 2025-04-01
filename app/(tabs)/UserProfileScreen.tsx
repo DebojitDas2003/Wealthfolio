@@ -12,6 +12,7 @@ import {
 import { Feather } from '@expo/vector-icons'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useNavigation } from '@react-navigation/native'
+import { useRouter } from 'expo-router'
 import {
   useFonts,
   Poppins_700Bold,
@@ -28,20 +29,16 @@ type RootStackParamList = {
   UpdateUserProfileScreen: undefined
   YourGoalsScreen: undefined
   YourGoalsProgressScreen: undefined
+  YourAccountScreens: undefined
+  LoanPaymentBreakdownScreen: undefined
 }
 
-type ProfileScreenNavigationProp = NativeStackNavigationProp<
-  RootStackParamList,
-  | 'YourCardScreen'
-  | 'TotalDebtsScreen'
-  | 'AccountDetailScreens'
-  | 'UpdateUserProfileScreen'
-  | 'YourGoalsScreen'
-  | 'YourGoalsProgressScreen'
->
+// You can simplify the navigation prop type by using the full RootStackParamList.
+type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>
 
 export default function UserProfileScreen() {
   const navigation = useNavigation<ProfileScreenNavigationProp>()
+  const router = useRouter()
 
   // Load Poppins fonts
   const [fontsLoaded] = useFonts({
@@ -143,7 +140,7 @@ export default function UserProfileScreen() {
           </View>
           <TouchableOpacity
             style={styles.editButton}
-            onPress={() => navigation.navigate('AccountDetailScreens')}
+            onPress={() => navigation.navigate('UpdateUserProfileScreen')}
           >
             <Feather name="edit-2" size={20} color="#ffffff" />
           </TouchableOpacity>
@@ -170,6 +167,27 @@ export default function UserProfileScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('AccountDetailScreens')}
+        >
+          <Text style={styles.menuItemText}>Account Detail</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => navigation.navigate('YourAccountScreens')}
+        >
+          <Text style={styles.menuItemText}>Your Accounts</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.menuItem}
+          onPress={() => router.push('/Notifications')}
+        >
+          <Text style={styles.menuItemText}>Loan Breakdown</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
           style={styles.refreshButton}
           onPress={handleFetchData}
         >
@@ -192,14 +210,13 @@ const styles = StyleSheet.create({
     marginTop: 20,
   },
   scrollContent: {
-    padding: 16,
+    padding: 10,
   },
   title: {
-    marginTop: 20,
     fontSize: 24,
     fontFamily: 'Poppins_700Bold',
     color: '#2c3e50',
-    marginBottom: 20,
+    marginBottom: 10,
     textAlign: 'center',
   },
   profileCard: {
@@ -207,7 +224,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#4CAF50',
     borderRadius: 12,
-    padding: 16,
+    padding: 10,
     marginBottom: 20,
   },
   profilePic: {
@@ -221,7 +238,7 @@ const styles = StyleSheet.create({
   },
   username: {
     fontSize: 18,
-    fontFamily: 'Poppins_700Bold',
+    fontFamily: 'Poppins_500Medium',
     color: '#ffffff',
   },
   email: {
@@ -236,7 +253,8 @@ const styles = StyleSheet.create({
   menuItem: {
     backgroundColor: '#ffffff',
     borderRadius: 8,
-    padding: 16,
+    paddingHorizontal: 15,
+    paddingVertical: 10,
     marginBottom: 12,
   },
   menuItemText: {

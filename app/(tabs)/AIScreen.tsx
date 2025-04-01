@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Poppins_700Bold',
     textAlign: 'center',
-    marginTop: '10%',
+    marginTop: '5%',
     marginBottom: 20,
   },
   chatContainer: {

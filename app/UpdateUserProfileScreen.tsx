@@ -1,166 +1,211 @@
-import React from 'react';
-import { View, Text, StyleSheet, SafeAreaView, Image, TouchableOpacity, ScrollView } from 'react-native';
-import { Feather } from '@expo/vector-icons';
+import React, { useState } from 'react'
+import {
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  TextInput,
+  ActivityIndicator,
+  Platform,
+} from 'react-native'
+import { Feather } from '@expo/vector-icons'
+import { useFonts } from 'expo-font'
+import { Poppins_700Bold } from '@expo-google-fonts/poppins'
+import { Inter_400Regular } from '@expo-google-fonts/inter'
 
 export default function UpdateUserProfileScreen() {
+  // Load fonts to match your Login screen style
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Poppins_700Bold,
+  })
+
+  // Local state for the user profile fields
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [email, setEmail] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+
+  if (!fontsLoaded) {
+    return (
+      <SafeAreaView style={styles.loaderContainer}>
+        <ActivityIndicator size="large" color="#1E1F4B" />
+      </SafeAreaView>
+    )
+  }
+
+  const handleUpdateProfile = () => {
+    // Handle your update logic here
+    console.log('Update Profile Pressed!')
+    console.log({
+      firstName,
+      lastName,
+      email,
+      phoneNumber,
+    })
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Text style={styles.title}>User Profile</Text>
+      <ScrollView
+        contentContainerStyle={styles.contentContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        {/* Profile avatar + dashed border container */}
+        <View style={styles.avatarContainer}>
+          <View style={styles.avatarPlaceholder}>
+            <Image
+              source={{ uri: 'https://example.com/profile-pic.jpg' }}
+              style={styles.avatar}
+            />
+          </View>
+        </View>
 
-        <View style={styles.profileCard}>
-          <Image
-            source={{ uri: 'https://example.com/profile-pic.jpg' }}
-            style={styles.profilePic}
+        {/* Username and Email */}
+        <Text style={styles.username}>Username</Text>
+        <Text style={styles.email}>user@gmail.com</Text>
+
+        {/* Input fields */}
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>First Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="John"
+            value={firstName}
+            onChangeText={setFirstName}
           />
-          <View style={styles.profileInfo}>
-            <Text style={styles.username}>Username</Text>
-            <Text style={styles.email}>@user.email</Text>
-          </View>
-          <TouchableOpacity style={styles.editButton}>
-            <Feather name="edit-2" size={20} color="#ffffff" />
-          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>Set your financial goals</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.menuItem}>
-          <Text style={styles.menuItemText}>Debt management</Text>
-        </TouchableOpacity>
-
-        <View style={styles.cardsSection}>
-          <Text style={styles.cardsSectionTitle}>Cards</Text>
-          <View style={styles.cardsContainer}>
-            <TouchableOpacity style={styles.card}>
-              <Feather name="credit-card" size={24} color="#ffffff" />
-              <Text style={styles.cardText}>DEBIT CARD</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.card}>
-              <Feather name="credit-card" size={24} color="#ffffff" />
-              <Text style={styles.cardText}>CREDIT CARD</Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Last Name</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Doe"
+            value={lastName}
+            onChangeText={setLastName}
+          />
         </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Email address</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="john.doe@example.com"
+            keyboardType="email-address"
+            autoCapitalize="none"
+            value={email}
+            onChangeText={setEmail}
+          />
+        </View>
+
+        <View style={styles.inputWrapper}>
+          <Text style={styles.label}>Phone Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="+1 555 123 4567"
+            keyboardType={Platform.OS === 'ios' ? 'numbers-and-punctuation' : 'numeric'}
+            value={phoneNumber}
+            onChangeText={setPhoneNumber}
+          />
+        </View>
+
+        {/* Update Profile Button */}
+        <TouchableOpacity style={styles.updateButton} onPress={handleUpdateProfile}>
+          <Text style={styles.updateButtonText}>Update Profile</Text>
+        </TouchableOpacity>
       </ScrollView>
-
-      <View style={styles.navbar}>
-        <TouchableOpacity style={styles.navItem}>
-          <Feather name="home" size={24} color="#7f8c8d" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Feather name="clock" size={24} color="#7f8c8d" />
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navItem, styles.activeNavItem]}>
-          <Feather name="bell" size={24} color="#ffffff" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Feather name="pie-chart" size={24} color="#7f8c8d" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
-          <Feather name="user" size={24} color="#7f8c8d" />
-        </TouchableOpacity>
-      </View>
     </SafeAreaView>
-  );
+  )
 }
 
+// ---------------- STYLES ----------------
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#d4f5d4', // same background as your login screen
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
     backgroundColor: '#d4f5d4',
   },
-  scrollContent: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 20,
-  },
-  profileCard: {
-    flexDirection: 'row',
+  contentContainer: {
+    padding: 10,
     alignItems: 'center',
-    backgroundColor: '#4CAF50',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
   },
-  profilePic: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+  // Avatar
+  avatarContainer: {
+    marginVertical: 20,
   },
-  profileInfo: {
-    marginLeft: 16,
-    flex: 1,
+  avatarPlaceholder: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    borderWidth: 2,
+    borderColor: '#30A13C',
+    borderStyle: 'dashed', // to mimic the dotted placeholder in the reference
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
   },
+  avatar: {
+    width: '100%',
+    height: '100%',
+    resizeMode: 'cover',
+  },
+  // Username & Email
   username: {
+    fontFamily: 'Poppins_700Bold',
     fontSize: 18,
-    fontWeight: 'bold',
-    color: '#ffffff',
+    color: '#1E1F4B',
+    marginBottom: 4,
   },
   email: {
+    fontFamily: 'Inter_400Regular',
     fontSize: 14,
-    color: '#ffffff',
-    opacity: 0.8,
+    color: '#1E1F4B',
+    marginBottom: 20,
   },
-  editButton: {
-    padding: 8,
+  // Input fields
+  inputWrapper: {
+    width: '100%',
+    marginBottom: 10,
   },
-  menuItem: {
-    backgroundColor: '#ffffff',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-  },
-  menuItemText: {
-    fontSize: 16,
+  label: {
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
     color: '#2c3e50',
+    marginBottom: 5,
+    marginLeft: 5,
   },
-  cardsSection: {
+  input: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 15,
+    paddingHorizontal: 20,
+    fontFamily: 'Inter_400Regular',
+    fontSize: 14,
+  },
+  // Update Button
+  updateButton: {
+    width: '100%',
+    height: 50,
+    backgroundColor: '#30A13C',
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginTop: 20,
   },
-  cardsSectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#2c3e50',
-    marginBottom: 12,
-  },
-  cardsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  card: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 8,
-    padding: 16,
-    alignItems: 'center',
-    width: '48%',
-  },
-  cardText: {
-    color: '#ffffff',
-    marginTop: 8,
-    fontSize: 12,
+  updateButtonText: {
+    fontFamily: 'Inter_400Regular',
+    color: '#fff',
+    fontSize: 16,
     fontWeight: 'bold',
   },
-  navbar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
-  },
-  navItem: {
-    alignItems: 'center',
-  },
-  activeNavItem: {
-    backgroundColor: '#4CAF50',
-    borderRadius: 20,
-    padding: 8,
-  },
-});
+})
