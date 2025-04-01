@@ -144,8 +144,7 @@ const styles = StyleSheet.create({
   header: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 16,
-    marginTop: 20,
+    padding: 10,
   },
   title: {
     fontSize: 24,
@@ -153,7 +152,7 @@ const styles = StyleSheet.create({
     color: '#2c3e50',
   },
   content: {
-    padding: 16,
+    padding: 10,
   },
   chartContainer: {
     height: 200,

@@ -156,6 +156,12 @@ const Login = () => {
             <Text style={styles.forgotPasswordText}>Forgot password?</Text>
           </TouchableOpacity>
           <TouchableOpacity
+            style={styles.forgotPassword}
+            onPress={() => router.push('/HomeScreen')}
+          >
+            <Text style={styles.forgotPasswordText}>Home</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
             onPress={handleLogin}
             disabled={loading}
