@@ -43,14 +43,12 @@ export default function AddTransaction() {
   const [description, setDescription] = useState('')
   const [isExpense, setIsExpense] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  const [categories, setCategories] = useState<Category[]>([])
-  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1)
   const [loadingCategories, setLoadingCategories] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
   const [token, setToken] = useState<string | null>(null)
 
-  // Default categories to use if API call fails
-  const defaultCategories = [
+  // Start with default categories to ensure UI always has something to show
+  const [categories, setCategories] = useState<Category[]>([
     { CategoryId: 1, Name: 'Food' },
     { CategoryId: 2, Name: 'Transportation' },
     { CategoryId: 3, Name: 'Entertainment' },
@@ -58,7 +56,8 @@ export default function AddTransaction() {
     { CategoryId: 5, Name: 'Bills' },
     { CategoryId: 6, Name: 'Salary' },
     { CategoryId: 7, Name: 'Other' },
-  ]
+  ])
+  const [selectedCategoryId, setSelectedCategoryId] = useState<number>(1)
 
   // Get user ID and token on component mount
   useEffect(() => {
@@ -67,8 +66,14 @@ export default function AddTransaction() {
         const storedToken = await AsyncStorage.getItem('access_token')
         if (storedToken) {
           setToken(storedToken)
-          const decoded = jwtDecode<JwtPayload>(storedToken)
-          setUserId(decoded.sub)
+          try {
+            const decoded = jwtDecode<JwtPayload>(storedToken)
+            console.log('Decoded token:', decoded)
+            setUserId(decoded.sub)
+            console.log('User ID set to:', decoded.sub)
+          } catch (error) {
+            console.error('Error decoding token:', error)
+          }
         } else {
           Alert.alert('Error', 'Not logged in. Please login first.')
           router.push('/(auth)/LoginScreen')
@@ -81,7 +86,7 @@ export default function AddTransaction() {
     getUserData()
   }, [])
 
-  // Fetch categories when userId and token are available
+  // Try to fetch categories from API when userId and token are available
   useEffect(() => {
     if (userId && token) {
       fetchCategories()
@@ -92,35 +97,67 @@ export default function AddTransaction() {
     if (!userId || !token) return
 
     setLoadingCategories(true)
-    try {
-      // Try to fetch categories from the backend
-      const response = await fetch(`http://192.168.114.85:5000/categories`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'X-Client-ID': 'b4db3b7b-502e-4df3-88c4-f509093769c6',
-          'X-Client-Secret': 'd541a27e-b873-4f69-9f6f-6c7553e86d16',
-        },
-      })
 
-      // Check if the endpoint exists and returns valid data
-      if (response.ok) {
+    try {
+      console.log('Fetching categories...')
+
+      // First try the new combined endpoint that creates categories if needed
+      const response = await fetch(
+        'http://192.168.114.85:5000/categories/transactions/categories',
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            'X-Client-ID': 'b4db3b7b-502e-4df3-88c4-f509093769c6',
+            'X-Client-Secret': 'd541a27e-b873-4f69-9f6f-6c7553e86d16',
+          },
+        }
+      )
+
+      // If that fails, try the regular categories endpoint
+      if (!response.ok) {
+        const regularResponse = await fetch(
+          'http://192.168.114.85:5000/categories',
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+              'X-Client-ID': 'b4db3b7b-502e-4df3-88c4-f509093769c6',
+              'X-Client-Secret': 'd541a27e-b873-4f69-9f6f-6c7553e86d16',
+            },
+          }
+        )
+
+        if (regularResponse.ok) {
+          const data = await regularResponse.json()
+          console.log('Categories data received:', data)
+
+          if (Array.isArray(data) && data.length > 0) {
+            const mappedCategories = data.map((cat) => ({
+              CategoryId: cat.CategoryId,
+              Name: cat.category_name || cat.Name,
+            }))
+            setCategories(mappedCategories)
+            console.log('Categories updated from API:', mappedCategories)
+          }
+        }
+      } else {
+        // Process the response from the combined endpoint
         const data = await response.json()
-        if (data.categories && Array.isArray(data.categories)) {
-          setCategories(data.categories)
-          return
+        console.log('Categories data received from combined endpoint:', data)
+
+        if (Array.isArray(data) && data.length > 0) {
+          const mappedCategories = data.map((cat) => ({
+            CategoryId: cat.CategoryId,
+            Name: cat.category_name || cat.Name,
+          }))
+          setCategories(mappedCategories)
+          console.log('Categories updated from combined API:', mappedCategories)
         }
       }
-
-      // If categories endpoint isn't implemented or returns invalid data, use default categories
-      console.log(
-        'Using default categories due to API failure or missing endpoint'
-      )
-      setCategories(defaultCategories)
     } catch (error) {
       console.error('Error fetching categories:', error)
-      // Use default categories if API call fails
-      setCategories(defaultCategories)
+      // Keep using default categories that were set in state initially
     } finally {
       setLoadingCategories(false)
     }
@@ -146,6 +183,18 @@ export default function AddTransaction() {
       : Math.abs(parseFloat(amount))
 
     try {
+      // Ensure we have a valid category ID
+      const categoryId = selectedCategoryId || 7 // Default to "Other" if nothing selected
+
+      // Log the request data for debugging
+      const requestData = {
+        CategoryId: categoryId,
+        Amount: finalAmount,
+        TransactionDate: formatDateForMySQL(new Date()),
+        Description: description || 'Transaction',
+      }
+      console.log('Sending transaction request with data:', requestData)
+
       const response = await fetch('http://192.168.114.85:5000/transactions', {
         method: 'POST',
         headers: {
@@ -154,13 +203,10 @@ export default function AddTransaction() {
           'X-Client-ID': 'b4db3b7b-502e-4df3-88c4-f509093769c6',
           'X-Client-Secret': 'd541a27e-b873-4f69-9f6f-6c7553e86d16',
         },
-        body: JSON.stringify({
-          CategoryId: selectedCategoryId,
-          Amount: finalAmount,
-          TransactionDate: formatDateForMySQL(new Date()),
-          Description: description || 'Transaction',
-        }),
+        body: JSON.stringify(requestData),
       })
+
+      console.log('Transaction response status:', response.status)
 
       if (response.status === 401) {
         Alert.alert('Session Expired', 'Please login again')
@@ -175,15 +221,49 @@ export default function AddTransaction() {
         throw new Error(`Failed to add transaction: ${response.status}`)
       }
 
+      const responseData = await response.json()
+      console.log('Transaction created successfully:', responseData)
+
       Alert.alert('Success', 'Transaction added successfully', [
         { text: 'OK', onPress: () => router.back() },
       ])
     } catch (error) {
       console.error('Error adding transaction:', error)
-      Alert.alert('Error', 'Failed to add transaction')
+      Alert.alert('Error', 'Failed to add transaction. Please try again.')
     } finally {
       setIsLoading(false)
     }
+  }
+
+  // Debug information component
+  const renderDebugInfo = () => {
+    if (__DEV__) {
+      return (
+        <View
+          style={{
+            padding: 10,
+            margin: 10,
+            backgroundColor: 'rgba(0,0,0,0.05)',
+            borderRadius: 5,
+          }}
+        >
+          <Text style={{ fontSize: 12, fontWeight: 'bold' }}>Debug Info:</Text>
+          <Text style={{ fontSize: 12 }}>User ID: {userId || 'Not set'}</Text>
+          <Text style={{ fontSize: 12 }}>
+            Categories Count: {categories.length}
+          </Text>
+          <Text style={{ fontSize: 12 }}>
+            Selected Category:{' '}
+            {categories.find((c) => c.CategoryId === selectedCategoryId)
+              ?.Name || 'None'}
+          </Text>
+          <Text style={{ fontSize: 12 }}>
+            Loading Categories: {loadingCategories ? 'Yes' : 'No'}
+          </Text>
+        </View>
+      )
+    }
+    return null
   }
 
   return (
@@ -265,6 +345,9 @@ export default function AddTransaction() {
             ))}
           </View>
         )}
+
+        {/* Render debug info component */}
+        {renderDebugInfo()}
 
         <TouchableOpacity
           style={[styles.button, isLoading && styles.disabledButton]}
