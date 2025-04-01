@@ -318,12 +318,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#d4f5d4',
   },
   scrollContent: {
-    padding: 20,
+    padding: 10,
   },
   header: {
-    marginTop: 20,
-    padding: 20,
-    paddingBottom: 10,
+    padding: 10,
   },
   headerCard: {
     backgroundColor: '#C3F9C8',

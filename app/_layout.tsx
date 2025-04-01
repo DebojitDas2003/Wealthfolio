@@ -55,16 +55,17 @@ export default function RootLayout() {
             statusBarBackgroundColor: '#d4f5d4',
           }}
         />
-        <Stack.Screen name="RewardScreen" 
-        options={{
-          headerTitle: 'Rewards',
-          headerStyle: { backgroundColor: '#d4f5d4' },
-          headerTintColor: '#000000',
-          statusBarBackgroundColor: '#d4f5d4',
-        }} />
+        <Stack.Screen name="RewardScreen"
+          options={{
+            headerTitle: 'Rewards',
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }} />
         <Stack.Screen
           name="AccountDetailScreens"
           options={{
+            headerTitle: 'Account Detail',
             headerStyle: { backgroundColor: '#d4f5d4' },
             headerTintColor: '#000000',
             statusBarBackgroundColor: '#d4f5d4',
@@ -97,8 +98,20 @@ export default function RootLayout() {
             headerTintColor: '#000000',
             statusBarBackgroundColor: '#d4f5d4',
           }} />
-        <Stack.Screen name="UpdateUserProfileScreen" />
-        <Stack.Screen name="YourAccountScreens" />
+        <Stack.Screen name="UpdateUserProfileScreen"
+          options={{
+            headerTitle: 'Update Profile',
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }} />
+        <Stack.Screen name="YourAccountScreens"
+          options={{
+            headerTitle: 'Your Accounts',
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }} />
         <Stack.Screen
           name="YourCardScreen"
           options={{
@@ -118,12 +131,12 @@ export default function RootLayout() {
         <Stack.Screen name="YourGoalsScreen" />
         <Stack.Screen name="YourLoansScreen" />
         <Stack.Screen name="YourReferralScreen"
-        options={{
-          headerTitle: 'Referral',
-          headerStyle: { backgroundColor: '#d4f5d4' },
-          headerTintColor: '#000000',
-          statusBarBackgroundColor: '#d4f5d4',
-        }} />
+          options={{
+            headerTitle: 'Referral',
+            headerStyle: { backgroundColor: '#d4f5d4' },
+            headerTintColor: '#000000',
+            statusBarBackgroundColor: '#d4f5d4',
+          }} />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
